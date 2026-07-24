@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Наша история ❤️</title>
+
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+
+body{
+
+    background:#3d1018;
+
+    color:white;
+
+    font-family:"Segoe UI",sans-serif;
+
+    padding:40px 20px 100px;
+
+    overflow-x:hidden;
+
+    min-height:100vh;
+
+}
+
+
+
+.fade-screen{
+
+    position:fixed;
+
+    inset:0;
+
+    background:black;
+
+    opacity:0;
+
+    pointer-events:none;
+
+    transition:1.5s;
+
+    z-index:999;
+
+}
+
+
+.fade-screen.active{
+
+    opacity:1;
+
+}
+
+
+
+/* Основной контейнер */
+
+.memory-wrapper{
+
+    width:min(1400px,95%);
+
+    margin:auto;
+
+}
+
+
+
+/* Верхние фото */
+
+.photo-row{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:20px;
+
+    flex-wrap:wrap;
+
+    margin:20px 0;
+
+}
+
+
+
+.photo-row img,
+.side img{
+
+    width:150px;
+
+    height:150px;
+
+    object-fit:cover;
+
+    border-radius:22px;
+
+    box-shadow:
+    0 0 25px rgba(255,80,130,.45);
+
+    opacity:0;
+
+    animation:
+    photoShow 1.3s forwards,
+    floatPhoto 6s infinite ease-in-out;
+
+}
+
+
+
+.photo-row img:nth-child(odd),
+.side img:nth-child(odd){
+
+    transform:rotate(-8deg);
+
+}
+
+
+
+.photo-row img:nth-child(even),
+.side img:nth-child(even){
+
+    transform:rotate(7deg);
+
+}
+
+
+
+.photo-row img:nth-child(3n){
+
+    width:170px;
+
+    height:170px;
+
+}
+
+
+
+.side img:nth-child(2n){
+
+    margin-left:-20px;
+
+}
+
+
+
+.side img:nth-child(3n){
+
+    margin-right:-25px;
+
+}
+
+
+
+
+@keyframes floatPhoto{
+
+
+    0%,100%{
+
+        translate:0 0;
+
+    }
+
+
+    50%{
+
+        translate:0 -12px;
+
+    }
+
+
+}
+
+
+
+@keyframes photoShow{
+
+    from{
+
+        opacity:0;
+
+        transform:scale(.7) rotate(-8deg);
+
+    }
+
+
+    to{
+
+        opacity:1;
+
+        transform:scale(1) rotate(0);
+
+    }
+
+}
+
+
+
+
+/* Центральная часть */
+
+
+.middle{
+
+    display:grid;
+
+    grid-template-columns:170px minmax(300px,800px) 170px;
+
+    gap:35px;
+
+    align-items:center;
+
+    justify-content:center;
+
+}
+
+
+
+.side{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:20px;
+
+}
+
+
+
+.content{
+
+    text-align:center;
+
+}
+
+
+
+/* Текст */
+
+
+.text{
+
+    font-size:32px;
+
+    line-height:1.8;
+
+}
+
+
+
+.paragraph{
+
+    opacity:0;
+
+    transform:translateY(30px);
+
+    transition:1.2s;
+
+}
+
+
+.paragraph.show{
+
+    opacity:1;
+
+    transform:translateY(0);
+
+}
+
+
+
+.cursor{
+
+    display:inline-block;
+
+    width:2px;
+
+    animation:blink .8s infinite;
+
+}
+
+
+
+@keyframes blink{
+
+    50%{
+
+        opacity:0;
+
+    }
+
+}
+
+
+
+/* Сердце */
+
+
+.heart-block{
+
+    opacity:0;
+
+    margin-top:30px;
+
+    transition:2s;
+
+}
+
+
+
+.heart-block.show{
+
+    opacity:1;
+
+}
+
+
+
+.heart{
+
+    display:inline-block;
+
+    font-size:5rem;
+
+    cursor:pointer;
+
+    animation:heartBeat 1.3s infinite;
+
+}
+
+
+
+@keyframes heartBeat{
+
+    0%,100%{
+
+        transform:scale(1);
+
+        filter:drop-shadow(0 0 5px #ff4f81);
+
+    }
+
+
+    50%{
+
+        transform:scale(1.25);
+
+        filter:drop-shadow(0 0 25px #ff4f81);
+
+    }
+
+}
+
+
+
+.heart-text{
+
+    margin-top:15px;
+
+    color:#ffc4d6;
+
+    font-size:1.3rem;
+
+    font-weight:bold;
+
+}
+
+
+
+/* Адаптация */
+
+
+@media(max-width:900px){
+
+
+    .middle{
+
+        grid-template-columns:1fr;
+
+    }
+
+
+    .side{
+
+        flex-direction:row;
+
+        flex-wrap:wrap;
+
+        justify-content:center;
+
+    }
+
+
+    .photo-row img,
+    .side img{
+
+        width:100px;
+
+        height:100px;
+
+    }
+
+
+    .text{
+
+        font-size:24px;
+
+    }
+
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="fade-screen"></div>
+
+
+
+<div class="memory-wrapper">
+
+
+    <!-- верх -->
+
+
+    <div class="photo-row">
+
+
+        <img src="images/emotion/angry.png">
+        <img src="images/emotion/army.png">
+        <img src="images/emotion/buhchit.png">
+        <img src="images/emotion/cock.png">
+        <img src="images/emotion/legend.png">
+
+
+    </div>
+
+
+
+
+    <div class="middle">
+
+
+        <!-- левая сторона -->
+
+
+        <div class="side">
+
+
+            <img src="images/emotion/nopainnogain.jpg">
+            <img src="images/emotion/sexy.png">
+            <img src="images/emotion/smile.png">
+            <img src="images/emotion/think.png">
+
+
+        </div>
+
+
+
+
+
+        <!-- текст + сердце -->
+
+
+        <div class="content">
+
+
+            <div class="text" id="text"></div>
+
+
+
+            <div class="heart-block" id="heartBlock">
+
+
+                <div class="heart">
+                    ❤️
+                </div>
+
+
+                <p class="heart-text">
+                    Пойдем создавать момент вместе?
+                </p>
+
+
+            </div>
+
+
+        </div>
+
+
+
+
+
+        <!-- правая сторона -->
+
+
+        <div class="side">
+
+
+            <img src="images/belka.jpg">
+            <img src="images/cats.png">
+            <img src="images/eat.png">
+            <img src="images/eyeOfSun.png">
+
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+    <!-- низ -->
+
+
+    <div class="photo-row">
+
+
+        <img src="images/girl.png">
+        <img src="images/meeting.png">
+        <img src="images/nerpa.png">
+        <img src="images/velik.jpg">
+        <img src="images/together.png">
+
+
+    </div>
+
+
+
+</div>
+
+
+
+
+
+<audio id="bgMusic" loop>
+
+    <source src="music/eight.mp3" type="audio/mpeg">
+
+</audio>
+
+
+
+
+
+<script>
+
+
+const textValue =
+
+"Я обожаю создавать с тобой новые счастливые моменты. И хочу чтобы в будущем их было бы только больше";
+
+
+
+const text=document.getElementById("text");
+
+const heartBlock=document.getElementById("heartBlock");
+
+const music=document.getElementById("bgMusic");
+
+document.querySelectorAll(".photo-row img, .side img")
+.forEach((photo)=>{
+
+
+    let rotate =
+    Math.random()*20-10;
+
+
+    let moveX =
+    Math.random()*30-15;
+
+
+    photo.style.transform =
+    `
+    translateX(${moveX}px)
+    rotate(${rotate}deg)
+    `;
+
+
+});
+
+
+window.addEventListener("load",()=>{
+
+
+    if(localStorage.getItem("audioUnlocked")==="true"){
+
+
+        music.volume=.25;
+
+
+        music.play().catch(()=>{});
+
+
+    }
+
+
+});
+
+
+
+
+
+setTimeout(async()=>{
+
+
+    await typeText();
+
+
+    await sleep(1000);
+
+
+    heartBlock.classList.add("show");
+
+
+},2500);
+
+
+
+
+
+function sleep(ms){
+
+    return new Promise(resolve=>setTimeout(resolve,ms));
+
+}
+
+
+
+
+async function typeText(){
+
+
+    const p=document.createElement("div");
+
+
+    p.className="paragraph show";
+
+
+    text.appendChild(p);
+
+
+
+    const cursor=document.createElement("span");
+
+
+    cursor.className="cursor";
+
+    cursor.textContent="|";
+
+
+    p.appendChild(cursor);
+
+
+
+    for(let char of textValue){
+
+
+        cursor.insertAdjacentText(
+
+            "beforebegin",
+
+            char
+
+        );
+
+
+        await sleep(45);
+
+
+    }
+
+
+
+    cursor.remove();
+
+
+}
+
+
+
+
+
+
+function fadeOutMusic(duration=2000){
+
+
+    let step=music.volume/(duration/50);
+
+
+
+    let fade=setInterval(()=>{
+
+
+        if(music.volume>step){
+
+            music.volume-=step;
+
+        }
+
+        else{
+
+            music.volume=0;
+
+            clearInterval(fade);
+
+        }
+
+
+    },50);
+
+
+}
+
+
+
+
+
+
+document.querySelector(".heart").onclick=()=>{
+
+
+    fadeOutMusic();
+
+
+
+    document
+    .querySelector(".fade-screen")
+    .classList.add("active");
+
+
+
+    setTimeout(()=>{
+
+
+        window.location.href="FinalScreen.html";
+
+
+    },2000);
+
+
+};
+
+
+
+</script>
+
+
+</body>
+
+</html>

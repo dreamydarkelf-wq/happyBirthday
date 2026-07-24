@@ -1,0 +1,1912 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+<meta charset="UTF-8">
+<title>JRPG Cat Pit</title>
+
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    height:100vh;
+    background:#000;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-family:'Press Start 2P', monospace;
+}
+
+
+#fadeScreen{
+    position:absolute;
+    inset:0;
+    background:#000;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 2.5s linear;
+    z-index:9999;
+}
+
+#fadeScreen.show{
+    opacity:1;
+}
+
+
+.game{
+
+    width:900px;
+    height:600px;
+
+    position:relative;
+    overflow:hidden;
+
+    border:8px solid white;
+
+    box-shadow:
+    0 0 0 8px #333,
+    0 0 40px black;
+}
+
+
+/* ==========================
+   ЯМА
+========================== */
+
+#battleLayer{
+    position:absolute;
+    inset:0;
+
+    background:
+    radial-gradient(
+        ellipse at center,
+        #242020 0%,
+        #090505 55%,
+        #000 100%
+    );
+
+    overflow:hidden;
+}
+
+
+/* каменная глубина */
+
+#pitBackground{
+
+    position:absolute;
+    inset:0;
+
+    background:
+    radial-gradient(
+        ellipse at center,
+        #151515 0%,
+        #050505 70%,
+        #000 100%
+    );
+
+}
+
+
+
+/* ==========================
+   ПЛИТКИ
+========================== */
+
+#tiles{
+
+    position:absolute;
+
+    width:700px;
+    height:520px;
+
+    left:100px;
+    top:40px;
+
+}
+
+
+.tile{
+
+    position:absolute;
+
+    width:84px;
+    height:98px;
+
+    background:none;
+
+    transition:
+    transform .8s ease,
+    opacity .8s ease;
+
+    z-index:5;
+
+}
+
+
+.tile img{
+
+    width:84px;
+    height:98px;
+
+    display:block;
+
+    image-rendering:pixelated;
+
+}
+
+
+
+.tile.falling{
+
+    transform:
+    translateY(600px)
+    rotate(20deg);
+
+    opacity:0;
+
+}
+
+
+
+/* ==========================
+   КОТ
+========================== */
+
+.cat{
+
+    position:absolute;
+
+    font-size:60px;
+
+    z-index:10;
+
+    transition:
+    left .1s linear,
+    top .1s linear;
+
+    transform-origin:center;
+
+}
+
+
+.cat.falling{
+
+    animation:catFall .8s forwards;
+	z-index:0;
+}
+
+
+@keyframes catFall{
+
+
+    0%{
+
+        transform:
+        scale(1)
+        rotate(0deg);
+
+        opacity:1;
+
+    }
+
+
+    100%{
+
+        transform:
+        translateY(250px)
+        scale(.1)
+        rotate(720deg);
+
+        opacity:0;
+
+    }
+
+}
+
+
+
+/* ==========================
+   ТАЙМЕР
+========================== */
+
+
+#timer{
+    position:absolute;
+
+    top:25px;
+    left:35px;
+
+    display:none;
+
+    align-items:center;
+
+    gap:8px;
+
+    color:white;
+
+    text-shadow:
+    3px 3px #000;
+
+    z-index:20;
+
+}
+
+
+.timer-icon{
+
+    font-size:38px;
+
+}
+
+
+#timerValue{
+
+    font-size:32px;
+
+}
+
+
+
+
+/* ==========================
+   ДИАЛОГ
+========================== */
+
+
+#dialogLayer{
+
+    position:absolute;
+
+    inset:0;
+
+    z-index:50;
+
+    pointer-events:none;
+
+    transition:
+    transform .6s ease,
+    opacity .6s ease;
+
+}
+
+
+#dialogLayer.hide{
+
+    transform:translateY(650px);
+
+    opacity:0;
+
+}
+
+
+.character{
+
+    position:absolute;
+
+    bottom:170px;
+
+    width:270px;
+    height:270px;
+
+    display:flex;
+
+    align-items:end;
+
+    justify-content:center;
+
+    opacity:.35;
+
+}
+
+
+.character.active{
+
+    opacity:1;
+
+    transform:
+    translateY(-12px);
+
+}
+
+
+
+.character img{
+
+    max-width:100%;
+    max-height:100%;
+
+    image-rendering:pixelated;
+
+}
+
+
+.left{
+    left:30px;
+}
+
+
+.right{
+    right:30px;
+}
+
+
+.right img{
+
+    transform:scaleX(-1);
+
+}
+
+
+
+.dialogue{
+
+    position:absolute;
+
+    left:35px;
+    right:35px;
+
+    bottom:35px;
+
+    min-height:160px;
+
+    background:#101848;
+
+    border:6px solid white;
+
+    box-shadow:
+
+    inset 0 0 0 4px #555,
+    0 0 0 4px black;
+
+
+    padding:35px;
+
+    color:white;
+
+}
+
+
+
+.name{
+
+    position:absolute;
+
+    top:-38px;
+
+    left:25px;
+
+    padding:12px 25px;
+
+    background:#222;
+
+    border:5px solid white;
+
+    color:#ffe680;
+
+}
+
+
+
+.text{
+
+    font-size:18px;
+
+    line-height:1.8;
+
+}
+
+
+
+.next{
+
+    position:absolute;
+
+    right:25px;
+
+    bottom:15px;
+
+}
+
+
+
+.hint{
+
+    position:absolute;
+
+    bottom:5px;
+
+    width:100%;
+
+    text-align:center;
+
+    color:#aaa;
+
+    font-size:10px;
+
+}
+
+
+
+/* ==========================
+   ОКНА ПОБЕДЫ/ПОРАЖЕНИЯ
+========================== */
+
+
+.overlay{
+
+    position:absolute;
+
+    inset:0;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:
+    rgba(0,0,0,.75);
+
+    z-index:100;
+
+    opacity:0;
+
+    pointer-events:none;
+
+}
+
+
+
+.overlay.show{
+
+    opacity:1;
+
+    pointer-events:auto;
+
+}
+
+
+
+.overlay-box{
+
+    background:#101848;
+
+    border:6px solid white;
+
+    padding:40px 60px;
+
+    text-align:center;
+
+}
+
+
+.overlay-title{
+
+    color:white;
+
+    font-size:24px;
+
+    margin-bottom:35px;
+
+}
+
+
+
+button{
+
+    font-family:'Press Start 2P';
+
+    font-size:16px;
+
+    padding:18px 28px;
+
+    background:#ffe680;
+
+    border:4px solid white;
+
+}
+
+#evilEyesLayer{
+
+    position:absolute;
+    inset:0;
+
+    pointer-events:none;
+
+    z-index:0;
+
+    overflow:hidden;
+
+}
+
+
+.evil-eye{
+
+    position:absolute;
+
+    width:64px;
+    height:64px;
+
+    background-size:contain;
+    background-repeat:no-repeat;
+
+    image-rendering:pixelated;
+
+    opacity:0;
+
+    animation:
+    eyeAppear 12s infinite ease-in-out;
+
+}
+
+
+/* появление, маленькое движение, исчезновение */
+
+@keyframes eyeAppear{
+
+
+    0%{
+
+        opacity:0;
+
+        transform:
+        translate(0,0)
+        scale(.8);
+
+    }
+
+
+    35%{
+
+        opacity:0;
+
+    }
+
+
+    45%{
+
+        opacity:1;
+
+    }
+
+
+    55%{
+
+        opacity:1;
+
+        transform:
+        translate(20px,5px)
+        scale(1);
+
+    }
+
+
+    65%{
+
+        opacity:.7;
+
+    }
+
+
+    75%{
+
+        opacity:0;
+
+    }
+
+
+    100%{
+
+        opacity:0;
+
+    }
+
+}
+
+.cry-cat{
+
+    font-size:55px;
+
+    display:inline-block;
+
+    vertical-align:middle;
+
+    animation:cryShake .8s infinite;
+
+}
+
+
+@keyframes cryShake{
+
+    0%{
+        transform:translateY(0);
+    }
+
+    50%{
+        transform:translateY(-8px);
+    }
+
+    100%{
+        transform:translateY(0);
+    }
+
+}
+
+.big-heart{
+
+    font-size:55px;
+
+    display:inline-block;
+
+    vertical-align:middle;
+
+    animation:heartBeat .8s infinite;
+
+}
+
+
+@keyframes heartBeat{
+
+    0%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.15);
+    }
+
+    100%{
+        transform:scale(1);
+    }
+
+}
+
+.transition-heart{
+
+    position:absolute;
+
+    pointer-events:none;
+
+    z-index:300;
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<div id="fadeScreen"></div>
+
+
+<div class="game">
+
+
+<div id="battleLayer">
+
+    <div id="pitBackground"></div>
+	
+	<div id="evilEyesLayer"></div>
+
+
+    <div id="tiles"></div>
+	<div id="timer">
+
+		<span class="timer-icon">
+			⏳
+		</span>
+
+		<span id="timerValue">
+			30
+		</span>
+
+	</div>
+
+    <div id="cat" class="cat">
+        🙀
+    </div>
+
+</div>
+
+<!-- ==========================
+     ПРОИГРЫШ
+========================== -->
+
+<div id="gameOverScreen" class="overlay">
+
+    <div class="overlay-box">
+
+        <div class="overlay-title">
+
+            Яма подкралась к котичке 
+			<span class="cry-cat">😿</span>
+
+        </div>
+
+
+        <button id="retryButton">
+
+            Попробовать снова
+
+        </button>
+
+
+    </div>
+
+</div>
+
+
+
+<!-- ==========================
+     ПОБЕДА
+========================== -->
+
+
+<div id="winScreen" class="overlay">
+
+
+    <div class="overlay-box">
+
+
+        <div class="overlay-title" id="winTitle">
+
+            Котичка убежала от ямы <span class='big-heart'>❤️</span>
+
+        </div>
+
+
+        <button id="continueButton">
+
+            Продолжение нашей истории...
+
+        </button>
+
+
+    </div>
+
+
+</div>
+
+
+
+
+
+<!-- ==========================
+     ДИАЛОГОВЫЙ СЛОЙ
+========================== -->
+
+
+<div id="dialogLayer">
+
+
+    <div class="character left" id="leftCharacter">
+
+        <img id="leftPortrait">
+
+    </div>
+
+
+
+    <div class="character right" id="rightCharacter">
+
+        <img id="rightPortrait">
+
+    </div>
+
+
+
+
+
+    <div class="dialogue">
+
+
+        <div class="name" id="name"></div>
+
+
+        <div class="text" id="text"></div>
+
+
+        <div class="next">
+            ▼
+        </div>
+
+
+    </div>
+
+
+
+    <div class="hint">
+
+        ENTER — продолжить
+
+    </div>
+
+
+</div>
+
+
+
+</div> <!-- game -->
+
+
+
+
+<!-- ==========================
+     МУЗЫКА
+========================== -->
+
+
+<audio id="loseOne" src="music/loseOne.mp3"></audio>
+
+<audio id="loseTwo" src="music/loseTwo.mp3"></audio>
+
+
+<audio id="bgm" 
+src="music/dialogBattleMusic.mp3"
+loop>
+</audio>
+
+
+<audio id="winMusic"
+src="music/winMusic.mp3">
+</audio>
+
+
+<audio id="typeSound"
+src="music/keyboard.mp3">
+</audio>
+
+<audio id="pitFall" 
+src="music/pitFall.mp3">
+</audio>
+
+<audio id="loseOne" src="music/loseOne.mp3"></audio>
+<audio id="loseTwo" src="music/loseTwo.mp3"></audio>
+<audio id="tileFall" src="music/tileFall.mp3"></audio>
+
+
+<script>
+
+
+// ===============================
+// ДИАЛОГИ
+// ===============================
+
+
+const dialogues=[
+
+{
+name:"Котичка",
+img:"images/emotion/angry.png",
+side:"left",
+text:"Я знаю что ты затаился, мой злейший враг, выходи не прячься!"
+},
+
+{
+name:"Просто яма",
+img:"images/pit.png",
+side:"right",
+text:"*это буквально просто яма*"
+},
+
+{
+name:"Котичка",
+img:"images/girl.png",
+side:"left",
+text:"АААААААА! Она пытается менять убить!"
+}
+
+];
+
+const escapeDialogues=[
+
+{
+    name:"Котичка",
+    img:"images/emotion/smile.png",
+    side:"left",
+    text:"Не сегодня, чертова яма"
+},
+
+{
+    name:"Просто яма",
+    img:"images/pit.png",
+    side:"right",
+    text:"*Все еще просто яма*"
+}
+
+];
+
+
+
+// ===============================
+// ЭЛЕМЕНТЫ
+// ===============================
+
+
+const tilesLayer=document.getElementById("tiles");
+const cat=document.getElementById("cat");
+
+
+const dialogLayer=document.getElementById("dialogLayer");
+
+const nameBox=document.getElementById("name");
+const textBox=document.getElementById("text");
+
+const leftPortrait=document.getElementById("leftPortrait");
+const rightPortrait=document.getElementById("rightPortrait");
+
+const leftCharacter=document.getElementById("leftCharacter");
+const rightCharacter=document.getElementById("rightCharacter");
+
+
+const bgm=document.getElementById("bgm");
+const winMusic=document.getElementById("winMusic");
+const typeSound=document.getElementById("typeSound");
+const pitFall = document.getElementById("pitFall");
+const loseOne = document.getElementById("loseOne");
+const loseTwo = document.getElementById("loseTwo");
+const tileFall = document.getElementById("tileFall");
+
+tileFall.volume = 0.35;
+pitFall.volume = 0.4;
+
+const timerValue=document.getElementById("timerValue");
+
+const winScreen=document.getElementById("winScreen");
+const loseScreen=document.getElementById("gameOverScreen");
+
+const continueButton=document.getElementById("continueButton");
+const retryButton=document.getElementById("retryButton");
+
+
+
+
+
+// ===============================
+// МУЗЫКА
+// ===============================
+
+
+bgm.volume=.25;
+winMusic.volume=.25;
+
+typeSound.volume=.2;
+
+
+window.onload=()=>{
+
+bgm.play().catch(()=>{});
+
+};
+
+
+// ===============================
+// ДИАЛОГИ
+// ===============================
+
+
+let dialogueIndex=0;
+let currentDialogues = dialogues;
+let typing=false;
+let finishedDialogue=false;
+
+
+let typingInterval = null;
+
+function showDialogue(){
+
+    clearInterval(typingInterval);
+	
+	if (dialogueIndex === 2) {
+        prepareFall(tiles.find(tile => tile.col === 2 && tile.row === 1));
+    }
+
+    const d = currentDialogues[dialogueIndex];
+
+    nameBox.textContent = d.name;
+    textBox.textContent = "";
+
+    leftCharacter.classList.remove("active");
+    rightCharacter.classList.remove("active");
+
+    if(d.side==="left"){
+        leftPortrait.src = d.img;
+        leftCharacter.classList.add("active");
+    }else{
+        rightPortrait.src = d.img;
+        rightCharacter.classList.add("active");
+    }
+
+    let i = 0;
+    typing = true;
+
+    typeSound.currentTime = 0;
+    typeSound.play().catch(()=>{});
+
+    typingInterval = setInterval(()=>{
+
+        textBox.textContent += d.text[i];
+        i++;
+
+        if(i >= d.text.length){
+            clearInterval(typingInterval);
+            typing = false;
+            typeSound.pause();
+            typeSound.currentTime = 0;
+        }
+
+    },45);
+}
+
+function playLoseSound(){
+
+    let sound =
+    Math.random() < 0.5
+    ? loseOne
+    : loseTwo;
+
+
+    sound.currentTime = 0;
+
+    sound.play().catch(()=>{});
+
+}
+
+
+
+document.addEventListener("keydown", e => {
+
+    if (e.key !== "Enter" || e.repeat) return;
+
+    if (typing) {
+
+        clearInterval(typingInterval);
+
+        typing = false;
+
+        textBox.textContent = currentDialogues[dialogueIndex].text;
+
+        typeSound.pause();
+        typeSound.currentTime = 0;
+
+        return;
+    }
+
+    dialogueIndex++;
+
+if (dialogueIndex >= currentDialogues.length) {
+
+
+    if(escapeDialogue){
+
+        dialogLayer.classList.add("hide");
+
+        setTimeout(()=>{
+
+            startEscape();
+
+        },700);
+
+        return;
+
+    }
+
+
+    dialogLayer.classList.add("hide");
+
+    setTimeout(startPit,1000);
+
+    return;
+
+}
+
+    showDialogue();
+});
+
+
+
+showDialogue();
+
+function startPit(){
+
+    if(pitStarted) return;
+		pitStarted = true;
+	
+	gameEnded = false;
+    running = true;
+
+    time=30;
+
+    timerValue.textContent=time;
+
+    prepareFall(firstFall);
+
+    setTimeout(startTimerFalls,2000);
+
+}
+
+
+
+// ===============================
+// СОЗДАНИЕ ЯМЫ
+// ===============================
+
+
+
+let tiles=[];
+
+
+
+
+
+const pitLayout = [
+
+    // центральный столбец 5
+    [0,0],
+    [1,0],
+    [2,0],
+    [3,0],
+    [4,0],
+
+    // левый ряд 4
+    [1,-1],
+    [2,-1],
+    [3,-1],
+    [4,-1],
+
+    // правый ряд 4
+    [1,1],
+    [2,1],
+    [3,1],
+    [4,1],
+
+    // внешний левый ряд 3
+    [2,-2],
+    [3,-2],
+    [4,-2],
+
+    // внешний правый ряд 3
+    [2,2],
+    [3,2],
+    [4,2]
+
+];
+
+
+const safeTiles=[
+"2:0",
+"3:0",
+"4:0"
+];
+
+
+function createPit(){
+    tilesLayer.innerHTML="";
+    tiles = [];
+    
+    const hexWidth = 84;
+    const hexHeight = 98;
+    
+    const horizontalStep = hexWidth * 0.75; // 63px
+    const verticalStep = hexHeight;         // 98px
+    
+    const numCols = 5;
+    const maxRows = 5;
+    
+    // Рассчитываем стартовый Y, чтобы вся фигура была по центру контейнера (520px)
+    const totalHeight = (maxRows - 1) * verticalStep + hexHeight + (hexHeight / 2);
+    const startY = (520 - totalHeight) / 2; 
+    
+    for(let col=0; col<numCols; col++){
+        // Количество тайлов уменьшается к краям (3-4-5-4-3)
+        const distFromCenter = Math.abs(col - 2);
+        const numTiles = maxRows - distFromCenter;
+        
+        // Смещение чередуется для ВСЕХ колонок (и боковых, и центральных)
+        const yOffset = (col % 2 === 0) ? hexHeight / 2 : 0;
+        
+        for(let row=0; row<numTiles; row++){
+            let tile = document.createElement("div");
+            tile.className = "tile";
+            
+            let img = document.createElement("img");
+            let spriteNumber = ((col + row) % 3) + 1;
+            img.src = `images/sprites/sprite-${spriteNumber}-1.png`;
+            
+            tile.appendChild(img);
+            
+            let posX = 100 + (col * horizontalStep);
+            let posY = startY + (row * verticalStep) + yOffset;
+            
+            tile.style.left = posX + "px";
+            tile.style.top = posY + "px";
+            tile.style.zIndex = col + 1;
+            
+            tilesLayer.appendChild(tile);
+            
+            tiles.push({
+                row: row,
+                col: col,
+				img: img,
+                element: tile,
+                alive: true,
+				safe:
+				(
+					col===2 &&
+					row>=2
+				)
+            });
+        }
+    }
+}
+
+
+createPit();
+
+const startTile = tiles.find(tile => tile.col === 2 && tile.row === 0);
+
+cat.style.left = (parseInt(startTile.element.style.left) + 12) + "px";
+cat.style.top  = (parseInt(startTile.element.style.top) + 100) + "px";
+
+let catX = parseInt(cat.style.left);
+let catY = parseInt(cat.style.top);
+
+let catSpeed = 2;
+
+let running=false;
+let gameEnded = false;
+let escapeDialogue = false;
+let pitStarted = false;
+let time=30;
+
+let keys = {};
+
+
+document.addEventListener("keydown", e=>{
+
+    if(!running) return;
+
+    keys[e.key] = true;
+
+});
+
+
+document.addEventListener("keyup", e=>{
+
+    keys[e.key] = false;
+
+});
+
+
+moveFreeCat();
+
+function moveFreeCat(){
+
+    if(running){
+
+        if(keys["ArrowLeft"])
+            catX -= catSpeed;
+
+        if(keys["ArrowRight"])
+            catX += catSpeed;
+
+        if(keys["ArrowUp"])
+            catY -= catSpeed;
+
+        if(keys["ArrowDown"])
+            catY += catSpeed;
+
+
+        cat.style.left = catX+"px";
+        cat.style.top = catY+"px";
+
+
+        checkCatGround();
+
+    }
+
+
+    requestAnimationFrame(moveFreeCat);
+
+}
+
+
+
+function checkCatGround(){
+
+
+    const catRect = cat.getBoundingClientRect();
+
+
+    const centerX =
+    catRect.left + catRect.width/2;
+
+
+    const centerY =
+    catRect.top + catRect.height/2;
+
+
+    let safe=false;
+
+
+    for(let tile of tiles){
+
+
+        if(!tile.alive) continue;
+
+
+        const rect =
+        tile.element.getBoundingClientRect();
+
+
+		const safeMargin = 10;
+
+
+		if(
+			centerX >= rect.left - safeMargin &&
+			centerX <= rect.right + safeMargin &&
+			centerY >= rect.top - safeMargin &&
+			centerY <= rect.bottom
+		){
+
+            safe=true;
+            break;
+
+        }
+
+    }
+
+
+    if(!safe){
+
+        catFall();
+
+    }
+
+}
+function fadeOutMusic(audio, duration = 1000){
+
+    let startVolume = audio.volume;
+
+    let steps = 30;
+    let step = 0;
+
+    let interval = duration / steps;
+
+
+    let fade = setInterval(()=>{
+
+        step++;
+
+        audio.volume =
+        startVolume * (1 - step / steps);
+
+
+        if(step >= steps){
+
+            clearInterval(fade);
+
+            audio.pause();
+            audio.currentTime = 0;
+            audio.volume = startVolume;
+
+        }
+
+    }, interval);
+
+}
+
+
+function catFall(){
+
+    if(gameEnded) return;
+
+    gameEnded = true;
+    running = false;
+
+
+    cat.style.zIndex = 0;
+
+
+    pitFall.currentTime = 0;
+    pitFall.play().catch(()=>{});
+
+
+    cat.classList.add("falling");
+
+
+	setTimeout(()=>{
+
+		fadeOutMusic(bgm, 1200);
+
+		loseScreen.classList.add("show");
+
+		playLoseSound();
+
+	},800);
+
+}
+
+// ===============================
+// ЗЛЫЕ ГЛАЗА В ПЕЩЕРЕ
+// ===============================
+
+
+const evilLayer =
+document.getElementById("evilEyesLayer");
+
+
+function createEvilEyes(){
+
+
+    for(let i=0;i<8;i++){
+
+
+        let eye=document.createElement("div");
+
+
+        eye.className="evil-eye";
+
+
+        eye.style.backgroundImage =
+        `url(images/evilEyes/eye${i+1}.png)`;
+
+
+        // только в глубине ямы
+
+        eye.style.left =
+        (80 + Math.random()*550)+"px";
+
+
+        eye.style.top =
+        (50 + Math.random()*350)+"px";
+
+
+		eye.style.animationDelay =
+		(Math.random()*8)+"s";
+
+
+        // дальние глаза меньше
+
+        let size =
+        0.5 + Math.random()*0.6;
+
+
+        eye.style.width="64px";
+        eye.style.height="64px";
+
+        eye.style.transform =
+        `scale(${size})`;
+
+
+        evilLayer.appendChild(eye);
+
+    }
+
+}
+
+
+createEvilEyes();
+
+function shuffle(array){
+
+    for(let i=array.length-1;i>0;i--){
+
+        const j=Math.floor(Math.random()*(i+1));
+
+        [array[i],array[j]]=
+        [array[j],array[i]];
+
+    }
+
+    return array;
+}
+
+
+
+let fallingQueue=[];
+
+
+// создаём "кольца" от края к центру
+
+const fallGroups = [
+
+    // внешние края
+    tile => tile.col===0 || tile.col===4,
+
+
+    // второе кольцо
+    tile => tile.col===1 || tile.col===3,
+
+
+    // центральные верхние
+    tile => tile.col===2 && !tile.safe
+
+];
+
+
+
+fallGroups.forEach(group=>{
+
+
+    let part = tiles.filter(tile=>{
+
+        return !tile.safe && group(tile);
+
+    });
+
+
+    shuffle(part);
+
+
+    fallingQueue.push(...part);
+
+
+});
+
+
+// первый падает сразу
+
+let firstFall =
+fallingQueue.shift();
+
+
+function prepareFall(tile){
+
+
+    let base =
+    tile.img.src;
+
+
+    let parts =
+    base.split("-1.png");
+
+
+    tile.img.src =
+    parts[0]+"-2.png";
+
+
+
+    setTimeout(()=>{
+
+
+        tile.img.src =
+        parts[0]+"-3.png";
+
+
+        setTimeout(()=>{
+
+            tile.element.classList.add("falling");
+
+            tile.alive=false;
+			
+			let sound = tileFall.cloneNode();
+
+			sound.volume = 0.35;
+
+			sound.play().catch(()=>{});
+
+        },500);
+
+
+    },800);
+
+
+}
+
+
+function startTimerFalls(){
+
+    let delay = 2000;
+
+
+    fallingQueue.forEach((tile,index)=>{
+
+        setTimeout(()=>{
+
+            if(gameEnded) return;
+
+            prepareFall(tile);
+
+
+        }, delay * index);
+
+
+    });
+
+}
+
+// ===============================
+// ИГРА
+// ===============================
+
+
+
+
+
+
+
+
+
+
+setInterval(()=>{
+
+
+if(!running)return;
+
+
+time--;
+
+timerValue.textContent=time;
+
+
+if(time<=0){
+
+    running=false;
+
+    startEscapeDialogue();
+
+}
+
+
+},1000);
+
+
+
+function startEscapeDialogue(){
+
+    if(escapeDialogue) return;
+	
+	cat.textContent = "😼";
+	
+    escapeDialogue = true;
+
+    currentDialogues = escapeDialogues;
+
+    dialogueIndex = 0;
+
+    dialogLayer.classList.remove("hide");
+
+    showDialogue();
+
+}
+
+
+// ===============================
+// ПОБЕГ КОТА
+// ===============================
+
+
+const escapePath=[
+
+
+[400,300],
+
+[330,250],
+
+[260,200],
+
+[190,150],
+
+[120,100]
+
+];
+
+
+function collapseSafeTiles(){
+
+
+    let safeLeft = tiles.filter(tile=>{
+
+        return tile.safe && tile.alive;
+
+    });
+
+
+    safeLeft.forEach((tile,index)=>{
+
+
+        setTimeout(()=>{
+
+
+            prepareFall(tile);
+
+
+        }, index*400);
+
+
+    });
+
+
+    setTimeout(()=>{
+
+
+        winGame();
+
+
+    }, safeLeft.length*400 + 1200);
+
+
+}
+
+
+function startEscape(){
+
+    running=false;
+
+
+    let move=setInterval(()=>{
+
+
+        catY += 5;
+
+        cat.style.top = catY+"px";
+
+
+        if(catY > 650){
+
+            clearInterval(move);
+
+
+            collapseSafeTiles();
+
+        }
+
+
+    },20);
+
+}
+
+
+
+
+
+
+// ===============================
+// ОБВАЛ
+// ===============================
+
+
+function collapsePit(){
+
+    tiles.forEach((tile,index)=>{
+
+        if(tile.alive){
+
+            setTimeout(()=>{
+
+                prepareFall(tile);
+
+            },index*500);
+
+        }
+
+    });
+
+
+    setTimeout(()=>{
+
+        showSecret();
+
+    }, tiles.length*500 + 2000);
+
+}
+
+
+
+
+// ===============================
+// СЕКРЕТ
+// ===============================
+
+
+function showSecret(){
+
+
+
+tilesLayer.innerHTML="";
+
+
+let secret=document.createElement("div");
+
+
+secret.style.position="absolute";
+
+secret.style.left="250px";
+
+secret.style.top="180px";
+
+secret.style.fontSize="90px";
+
+
+secret.innerHTML="🐱🐱🐱";
+
+
+
+tilesLayer.appendChild(secret);
+
+
+
+setTimeout(winGame,3000);
+
+
+
+}
+
+
+
+
+
+
+// ===============================
+// ПОБЕДА
+// ===============================
+
+
+function winGame(){
+
+    if(gameEnded) return;
+
+    gameEnded = true;
+    running = false;
+
+    winScreen.classList.add("show");
+
+    bgm.pause();
+
+    winMusic.play().catch(()=>{});
+
+}
+
+
+
+
+
+continueButton.onclick=()=>{
+
+
+document
+.getElementById("fadeScreen")
+.classList.add("show");
+
+
+setTimeout(()=>{
+
+
+window.location.href="SixthScreen.html";
+
+
+},2500);
+
+
+};
+
+
+
+
+
+
+// ===============================
+// ПРОИГРЫШ
+// ===============================
+
+
+retryButton.onclick=()=>{
+
+
+location.reload();
+
+
+};
+
+
+
+</script>

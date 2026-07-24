@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Диалог</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#000;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    font-family:Arial,sans-serif;
+    overflow:hidden;
+}
+
+#game{
+    position:relative;
+    width:900px;
+    height:1400px; /* было 1600 */
+    background:url("images/phone.png") center/cover no-repeat;
+}
+
+
+#screen{
+    position:absolute;
+    left:166px;
+    top:68px; /* было 158 */
+    width:568px;
+    height:1180px; /* было 1235 */
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    border-radius:45px;
+    background:#111;
+}
+
+/* Черный экран */
+#fade{
+    position:absolute;
+    inset:0;
+    background:#000;
+    z-index:100;
+    animation:fadeOut 2s ease forwards;
+}
+
+@keyframes fadeOut{
+    from{
+        opacity:1;
+    }
+    to{
+        opacity:0;
+        visibility:hidden;
+    }
+}
+
+/* Рабочая область */
+#content{
+    flex:1;
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#111;
+}
+
+/* Затемнение краев */
+#content::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    z-index:2;
+    background:
+    radial-gradient(
+        circle,
+        transparent 45%,
+        rgba(0,0,0,.75)
+    );
+}
+
+/* Главная GIF */
+#questionImage{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:contain;      /* заполняет весь экран */
+    image-rendering:pixelated;  /* если гифка не пиксельная */
+    z-index:1;
+}
+
+/* Диалог */
+#dialog{
+    flex-shrink:0;
+    background:
+    linear-gradient(
+        180deg,
+        rgba(20,20,20,.95),
+        rgba(0,0,0,.98)
+    );
+    padding:15px;
+    border-top:3px solid #555;
+    box-shadow:0 -5px 20px black;
+}
+
+
+
+/* Текст */
+#text{
+    color:white;
+    font-size:25px;
+    line-height:1.35;
+    min-height:90px;
+}
+
+/* Кнопки */
+.answers{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.answer{
+    width:100%;
+    background:#292929;
+    color:white;
+    border:2px solid #777;
+    border-radius:12px;
+    padding:12px;
+    font-size:22px;
+    cursor:pointer;
+    transition:.2s;
+    box-shadow:0 0 10px rgba(0,0,0,.8);
+}
+
+.answer:hover{
+    background:#4169ff;
+    border-color:white;
+    transform:scale(1.03);
+}
+
+.answer:active{
+    transform:scale(.97);
+}
+
+/* Затемнение всего сайта */
+#fadePage{
+    position:fixed;
+    inset:0;
+    background:#000;
+    z-index:9999;
+    animation:fadePageOut 2s ease forwards;
+}
+
+/* Затемнение экрана телефона */
+#fade{
+    position:absolute;
+    inset:0;
+    background:#000;
+    z-index:100;
+    animation:fadeScreenOut 2s ease forwards;
+}
+
+@keyframes fadePageOut{
+    from{
+        opacity:1;
+    }
+    to{
+        opacity:0;
+        visibility:hidden;
+    }
+}
+
+@keyframes fadeScreenOut{
+    from{
+        opacity:1;
+    }
+    to{
+        opacity:0;
+        visibility:hidden;
+    }
+}
+
+#introText{
+    position:absolute;
+    left:50%;
+    bottom:140px;          /* нижняя половина экрана */
+    transform:translateX(-50%);
+    width:90%;
+
+    z-index:10;
+
+    color:#fff;
+    font-size:29px;
+    font-weight:bold;
+    text-align:center;
+
+    text-shadow:
+        0 0 8px #000,
+        0 0 20px #000,
+        0 0 30px #000;
+
+    white-space:nowrap;
+    pointer-events:none;
+}
+
+#quiz{
+
+    display:none;
+
+    position:absolute;
+
+    inset:0;
+
+    z-index:20;
+
+    background:#111;
+
+    padding:25px;
+
+    text-align:center;
+
+    color:white;
+
+}
+
+
+#counter{
+
+    font-size:22px;
+    color:#ffd700;
+    margin-bottom:20px;
+
+}
+
+
+#quizImage{
+    width:100%;
+    max-height:350px;
+    height:auto;
+    object-fit:contain;
+    border-radius:25px;
+    display:block;
+}
+
+
+#quizQuestion{
+
+    margin:25px 0;
+
+    padding:15px;
+
+    background:rgba(0,0,0,.7);
+
+    border-radius:20px;
+
+    font-size:28px;
+
+    font-weight:bold;
+
+}
+
+
+#quizAnswers{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:15px;
+
+}
+
+
+.quizAnswer{
+
+    background:linear-gradient(
+        135deg,
+        #ff6fae,
+        #9b59ff
+    );
+
+    color:white;
+
+    border:none;
+
+    border-radius:30px;
+
+    padding:16px;
+
+    font-size:23px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+}
+#reaction{
+
+    display:none;
+
+    position:absolute;
+
+    inset:0;
+
+    z-index:200;
+
+    background:#000;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+
+#reactionImage{
+
+    position:absolute;
+
+    inset:0;
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+
+    image-rendering:auto;
+
+}
+
+
+#reactionText{
+
+    position:absolute;
+
+    bottom:120px;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:90%;
+
+    color:white;
+
+    font-size:42px;
+
+    font-weight:bold;
+
+    text-align:center;
+
+    z-index:2;
+
+    text-shadow:
+
+    0 0 10px black,
+
+    0 0 20px black,
+
+    0 0 40px black;
+
+}
+
+#transition{
+
+    position:absolute;
+
+    inset:0;
+
+    background:#000;
+
+    opacity:0;
+
+    z-index:500;
+
+    pointer-events:none;
+
+    transition:opacity 0.8s ease;
+
+}
+
+
+#transition.active{
+
+    opacity:1;
+
+}
+
+.final{
+
+    position:absolute;
+
+    inset:0;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:#111;
+
+    text-align:center;
+
+    color:white;
+
+}
+
+
+.finalImage{
+
+    width:100%;
+    height:500px; /* было 650 */
+
+    object-fit:cover;
+
+    border-radius:30px;
+
+    margin-bottom:40px;
+
+    animation:legendAppear 1.5s ease;
+
+}
+
+
+
+.finalText{
+
+    font-size:32px;
+
+    font-weight:bold;
+
+    line-height:1.5;
+
+    text-shadow:
+
+    0 0 10px #000,
+
+    0 0 20px #ff69b4;
+
+    animation:textAppear 2s ease;
+
+}
+
+
+
+@keyframes legendAppear{
+
+    from{
+
+        opacity:0;
+
+        transform:scale(.8);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:scale(1);
+
+    }
+
+}
+
+
+
+@keyframes textAppear{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(40px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+.heart{
+
+    display:inline-block;
+
+    font-size:5rem;
+
+    cursor:pointer;
+
+    user-select:none;
+
+    animation:heartBeat 1.3s infinite;
+
+}
+
+@keyframes heartBeat{
+
+    0%,100%{
+
+        transform:scale(1);
+
+        filter:
+        drop-shadow(0 0 5px #ff4f81);
+
+    }
+
+    50%{
+
+        transform:scale(1.25);
+
+        filter:
+        drop-shadow(0 0 25px #ff4f81);
+
+    }
+
+}
+
+.heart-text{
+
+    margin-top:15px;
+
+    font-size:1.2rem;
+
+    color:#ffc4d6;
+
+    font-weight:bold;
+
+}
+
+.heart:active{
+
+    transform:scale(0.9);
+
+}
+
+.heart-block{
+    margin-top:45px;
+    text-align:center;
+}
+
+.heart{
+    display:inline-block;
+    font-size:5rem;
+    cursor:pointer;
+    animation:heartBeat 1.3s infinite;
+    transition:.3s;
+}
+
+.heart-text{
+    margin-top:15px;
+    color:#ffc4d6;
+    font-size:24px;
+    font-weight:bold;
+}
+
+@keyframes heartBeat{
+    0%,100%{
+        transform:scale(1);
+        filter:drop-shadow(0 0 5px #ff4f81);
+    }
+    50%{
+        transform:scale(1.2);
+        filter:drop-shadow(0 0 25px #ff4f81);
+    }
+}
+
+.fade-screen{
+    position:fixed;
+    inset:0;
+    background:#000;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 1.5s ease;
+    z-index:99999;
+}
+
+.fade-screen.active{
+    opacity:1;
+}
+</style>
+</head>
+
+<body>
+
+<div class="fade-screen"></div>
+
+<div id="fadePage"></div>
+
+<div id="game">
+
+<div id="screen">
+
+<div id="fade"></div>
+
+<div id="transition"></div>
+
+<div id="content">
+
+	<div id="reaction">
+
+		<img id="reactionImage">
+
+		<div id="reactionText"></div>
+
+	</div>
+
+	<div id="quiz">
+
+		<div id="counter"></div>
+
+		<img id="quizImage">
+
+		<div id="quizQuestion"></div>
+
+		<div id="quizAnswers">
+
+			<button class="quizAnswer"></button>
+			<button class="quizAnswer"></button>
+			<button class="quizAnswer"></button>
+			<button class="quizAnswer"></button>
+
+		</div>
+
+	</div>
+
+    <img id="questionImage"
+         src="images/sprite-animation.gif">
+
+    <div id="introText"></div>
+
+</div>
+
+<div id="dialog">
+
+<div id="text"></div>
+
+<div class="answers">
+
+<button class="answer" style="display:none;"></button>
+<button class="answer" style="display:none;"></button>
+<button class="answer" style="display:none;"></button>
+<button class="answer" style="display:none;"></button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<audio id="bgMusic" loop>
+
+    <source src="music/phone.mp3" type="audio/mpeg">
+
+</audio>
+
+<audio id="applauseMusic">
+    <source src="music/applause.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+
+const music = document.getElementById("bgMusic");
+const applause = document.getElementById("applauseMusic");
+
+
+function fadeInMusic(){
+
+    music.volume = 0;
+
+    music.play().catch(()=>{
+
+        console.log("Автовоспроизведение запрещено браузером");
+
+    });
+
+
+    let volume = 0;
+
+
+    const fade = setInterval(()=>{
+
+
+        if(volume < 0.25){
+
+            volume += 0.01;
+
+            music.volume = volume;
+
+        }
+        else{
+
+            clearInterval(fade);
+
+        }
+
+
+    },100);
+
+
+}
+
+
+
+
+
+
+window.addEventListener("load",()=>{
+
+
+    if(localStorage.getItem("audioUnlocked")==="true"){
+
+
+        fadeInMusic();
+
+
+    }
+
+
+});
+
+
+
+
+
+
+document.addEventListener("click",()=>{
+
+
+    if(localStorage.getItem("audioUnlocked")!=="true"){
+
+
+        localStorage.setItem(
+            "audioUnlocked",
+            "true"
+        );
+
+
+        fadeInMusic();
+
+
+    }
+
+
+},{once:true});
+
+const reactions = [
+
+{
+image:"images/face/smile.png",
+text:"Правильно!"
+},
+
+{
+image:"images/face/wat.png",
+text:"Вы знали ответ?!"
+},
+
+{
+image:"images/face/angry.png",
+text:"Немыслимо!"
+}
+
+];
+
+
+
+let current = 0;
+
+const quiz = [
+
+{
+image:"images/emotion/buhchit.png",
+
+question:
+"Кто изображен на этой фотографии?",
+
+answers:[
+"Бухчалка милая ❤️",
+"Бухчалка веселая ✨",
+"Бухчалка нежная 🌸",
+"Самая лучшая бухчалочка в мире🌟"
+]
+
+},
+
+
+{
+image:"images/emotion/cock.png",
+
+question:
+"Кто лучшая хозяюшка в мире?",
+
+activeAnswer:1,
+
+answers:[
+"Гордон Рамзи👨‍🍳",
+"Котичка 💖",
+"Реми🐀",
+"Константин Ивлев👨🏽‍🍳"
+]
+
+},
+
+
+{
+image:"images/worker.jpg",
+
+question:
+"Кто отличный специалист?",
+
+answers:[
+"Гениальная котичка 💎",
+"Котичка мастер на все руки 🌟",
+"Золотце а не работник - котичка ❤️",
+"Лучшая котичка 🌸"
+]
+
+},
+{
+image:"images/emotion/nopainnogain.jpg",
+
+question:
+"Кто самая накаченная машина в зале?",
+
+answers:[
+"Машина милая ❤️",
+"Машина суровая 😒",
+"Машиночка нежная 🌸",
+"Самая лучшая машина в мире🌟"
+]
+
+},
+{
+image:"images/emotion/sexy.png",
+
+question:
+"Кто самая сексуальная тигрица в мире?",
+
+answers:[
+"Альфа тигрица 🔥️",
+"Опасная тиграща 🐯",
+"Тигруленька 🌸",
+"Тигровый рулетик 🥐"
+]
+
+},
+{
+image:"images/emotion/army.png",
+
+question:
+"Кто самый трушный геймер в мире?",
+
+answers:[
+"Боевая котища 🔥️",
+"Сержант тигрила 🐯",
+"Котичка пацифистка 🌸",
+"Кисюля полевой повар🥐"
+]
+
+},
+{
+image:"images/nerpa.png",
+
+question:
+"😈 😈 😈",
+activeAnswer:2,
+
+answers:[
+"Рыба 🐠",
+"Бедная рыбка 🐡",
+"Нерпа 🦦",
+"Странная рыба🐳"
+]
+
+}
+
+];
+
+function fadeTransition(callback){
+
+    const t =
+    document.getElementById("transition");
+
+
+    t.classList.add("active");
+
+
+    setTimeout(()=>{
+
+        callback();
+
+
+        setTimeout(()=>{
+
+            t.classList.remove("active");
+
+        },300);
+
+
+    },800);
+
+}
+
+function showReaction(callback){
+
+    let r =
+    reactions[
+        Math.floor(Math.random()*reactions.length)
+    ];
+
+
+    document.getElementById("reactionImage").src =
+    r.image;
+
+
+    document.getElementById("reactionText").textContent =
+    r.text;
+
+
+    let box =
+    document.getElementById("reaction");
+
+
+	fadeTransition(()=>{
+
+		box.style.display="flex";
+
+	});
+
+
+	setTimeout(()=>{
+
+
+		fadeTransition(()=>{
+
+
+			box.style.display="none";
+
+
+			callback();
+
+
+		});
+
+
+	},2000);
+
+}
+
+
+
+const introText =
+'Вас ждет викторина\n\n ❤️Самая лучшая девочка на свете❤️\n\nПоехали!';
+
+function fadeOutMusic(duration){
+
+    let volume = music.volume;
+
+    let step = volume / (duration / 100);
+
+    let fade = setInterval(()=>{
+
+        volume -= step;
+
+        if(volume <= 0){
+
+            volume = 0;
+            music.volume = 0;
+            music.pause();
+
+            clearInterval(fade);
+
+        } else {
+
+            music.volume = volume;
+
+        }
+
+    },100);
+
+}
+
+function typeWriter(text,speed=45){
+
+	const el=document.getElementById("introText");
+	
+    el.innerHTML="";
+
+    let i=0;
+
+    function print(){
+
+        if(i<text.length){
+
+            if(text[i]==="\n"){
+                el.innerHTML+="<br>";
+            }else{
+                el.innerHTML+=text[i];
+            }
+
+            i++;
+
+            setTimeout(print,speed);
+
+        }else{
+
+			setTimeout(()=>{
+
+				fadeTransition(()=>{
+
+					document.getElementById("introText").style.display="none";
+
+					document.getElementById("questionImage").style.display="none";
+
+
+					document.getElementById("quiz").style.display="block";
+
+
+					showQuizQuestion();
+
+				});
+
+
+			},3000);
+
+        }
+
+    }
+
+    print();
+
+}
+
+let currentQuestion = 0;
+
+
+function showQuizQuestion(){
+
+    let q = quiz[currentQuestion];
+
+
+	document.getElementById("counter").textContent = "";
+
+
+    document.getElementById("quizImage").src =
+    q.image;
+
+
+    document.getElementById("quizQuestion").textContent =
+    q.question;
+
+
+    document.querySelectorAll(".quizAnswer")
+    .forEach((button,index)=>{
+
+
+        button.textContent =
+        q.answers[index];
+
+
+		button.onclick=()=>{
+
+
+			// если activeAnswer указан,
+			// проверяем только эту кнопку
+			if(
+				q.activeAnswer !== undefined &&
+				index !== q.activeAnswer
+			){
+
+				return;
+
+			}
+
+
+			showReaction(()=>{
+
+
+				currentQuestion++;
+
+
+				if(currentQuestion < quiz.length){
+
+					showQuizQuestion();
+
+				}
+				else{
+
+					showFinal();
+
+				}
+
+
+			});
+
+
+		};
+
+
+    });
+
+}
+
+function showFinal(){
+
+    document.getElementById("quiz").innerHTML = `
+    <div class="final">
+
+        <img src="images/emotion/legend.png" class="finalImage">
+
+        <div class="finalText">
+            Все ответы правильные!
+            <br><br>
+            <strong>Ты самая лучшая из лучших!</strong>
+        </div>
+
+        <div class="heart-block">
+            <div class="heart">❤️</div>
+
+            <div class="heart-text">
+                Продолжение нашей истории...
+            </div>
+        </div>
+
+    </div>
+    `;
+	
+	    applause.volume = 0.6;
+    applause.play().catch(()=>{
+        console.log("Звук аплодисментов заблокирован браузером");
+    });
+
+    document.querySelector(".heart").onclick = () => {
+
+        document.querySelector(".heart").style.transform = "scale(1.5)";
+
+        fadeOutMusic(2000);
+
+        setTimeout(() => {
+            document.querySelector(".fade-screen").classList.add("active");
+        }, 500);
+
+        setTimeout(() => {
+            window.location.href = "EighthScreen.html"; // если следующий экран восьмой
+        }, 2000);
+
+    };
+
+}
+
+window.addEventListener("load", () => {
+    typeWriter(introText);
+});
+
+</script>
+
+</body>
+</html>

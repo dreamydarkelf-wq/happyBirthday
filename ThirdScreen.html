@@ -1,0 +1,2854 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>JRPG Cat Encounter</title>
+
+
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+
+*{
+    box-sizing:border-box;
+}
+
+
+body{
+
+    margin:0;
+
+    height:100vh;
+
+    background:#000;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-family:'Press Start 2P', monospace;
+
+}
+
+
+
+/* ОБЩИЙ ЭКРАН */
+
+.transition-heart{
+
+    position:absolute;
+
+    pointer-events:none;
+
+    z-index:250;
+
+}
+#fadeScreen{
+
+    position:absolute;
+    inset:0;
+
+    background:#000;
+
+    opacity:0;
+
+    pointer-events:none;
+
+    transition:opacity 2.5s linear;
+
+    z-index:9999;
+
+}
+
+#fadeScreen.show{
+
+    opacity:1;
+
+}
+
+.game{
+
+
+    width:900px;
+
+    height:600px;
+
+
+    position:relative;
+
+
+    overflow:hidden;
+
+
+    border:8px solid white;
+
+
+    box-shadow:
+
+    0 0 0 8px #333,
+
+    0 0 40px black;
+
+
+}
+
+
+
+/* ===========================
+   ИГРА НА ФОНЕ
+=========================== */
+
+
+#battleLayer{
+
+
+    position:absolute;
+
+    inset:0;
+
+
+    z-index:1;
+
+
+    background:
+
+    linear-gradient(
+
+        135deg,
+
+        #ffd6e8,
+
+        #fff0c9
+
+    );
+
+
+    overflow:hidden;
+
+
+}
+
+
+
+/* ===========================
+   ДИАЛОГ ПОВЕРХ ИГРЫ
+=========================== */
+
+
+
+/* ПОРТРЕТЫ */
+
+
+.character{
+
+
+    position:absolute;
+
+
+    bottom:170px;
+
+
+    width:270px;
+
+    height:270px;
+
+
+    display:flex;
+
+
+    align-items:end;
+
+    justify-content:center;
+
+
+    opacity:.35;
+
+
+    transition:.25s;
+
+
+}
+
+
+
+.character.active{
+
+
+    opacity:1;
+
+
+    transform:translateY(-12px);
+
+
+}
+
+
+
+
+.character img{
+
+
+    max-width:100%;
+
+    max-height:100%;
+
+
+    image-rendering:pixelated;
+
+
+}
+
+
+
+.left{
+
+    left:30px;
+
+}
+
+
+
+.right{
+
+    right:30px;
+
+}
+
+
+
+.right img{
+
+    transform:scaleX(-1);
+
+}
+
+
+
+
+
+/* ОКНО ДИАЛОГА */
+
+
+.dialogue{
+
+
+    position:absolute;
+
+
+    left:35px;
+
+    right:35px;
+
+    bottom:35px;
+
+
+    min-height:160px;
+
+
+    background:#101848;
+
+
+    border:6px solid white;
+
+
+    box-shadow:
+
+
+    inset 0 0 0 4px #555,
+
+
+    0 0 0 4px black;
+
+
+    padding:35px;
+
+
+    color:white;
+
+
+    pointer-events:auto;
+
+
+}
+
+#dialogLayer{
+
+    position:absolute;
+
+    inset:0;
+
+    z-index:20;
+
+    pointer-events:none;
+
+    transition:transform .6s ease, opacity .6s ease;
+
+}
+
+
+#dialogLayer.hide{
+
+    transform:translateY(650px);
+
+    opacity:0;
+
+}
+
+
+
+
+/* ИМЯ */
+
+
+.name{
+
+
+    position:absolute;
+
+
+    top:-38px;
+
+
+    left:25px;
+
+
+    padding:12px 25px;
+
+
+    background:#222;
+
+
+    border:5px solid white;
+
+
+    color:#ffe680;
+
+
+    font-size:16px;
+
+
+}
+
+
+
+
+
+/* ТЕКСТ */
+
+
+.text{
+
+
+    font-size:18px;
+
+
+    line-height:1.8;
+
+
+    text-shadow:
+
+    3px 3px #000;
+
+
+}
+
+
+
+
+
+
+.next{
+
+
+    position:absolute;
+
+
+    right:25px;
+
+
+    bottom:15px;
+
+
+    animation:blink 1s infinite;
+
+
+}
+
+
+
+@keyframes blink{
+
+
+    50%{
+
+        opacity:0;
+
+    }
+
+}
+
+
+
+
+.hint{
+
+
+    position:absolute;
+
+
+    bottom:5px;
+
+
+    width:100%;
+
+
+    text-align:center;
+
+
+    color:#aaa;
+
+
+    font-size:10px;
+
+
+}
+
+
+
+
+
+/* ===========================
+   ЭЛЕМЕНТЫ ИГРЫ
+   (сюда придут коты/пчёлы)
+=========================== */
+
+
+
+.cat{
+
+    position:absolute;
+
+    font-size:55px;
+
+    will-change:transform;
+
+}
+
+
+
+.bee{
+
+
+    position:absolute;
+
+
+    font-size:32px;
+
+
+}
+
+
+
+.object{
+
+
+    position:absolute;
+
+
+    font-size:45px;
+
+
+}
+
+#timer{
+
+    position:absolute;
+
+    top:25px;
+
+    left:35px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    color:white;
+
+    text-shadow:
+    3px 3px #000;
+
+    z-index:5;
+
+    animation:timerPulse 1s infinite;
+
+}
+
+
+.timer-icon{
+
+    font-size:38px;
+
+    line-height:1;
+
+    display:block;
+
+}
+
+
+#timerValue{
+
+    font-size:32px;
+
+    line-height:1;
+
+    display:block;
+
+    position:relative;
+
+    top:6px;
+
+}
+
+
+
+@keyframes timerPulse{
+
+    0%{
+
+        transform:scale(1);
+
+    }
+
+
+    50%{
+
+        transform:scale(1.15);
+
+    }
+
+
+    100%{
+
+        transform:scale(1);
+
+    }
+
+}
+
+@keyframes pop {
+
+    0%{
+        transform:scale(1);
+        opacity:1;
+    }
+
+    40%{
+        transform:scale(1.35) rotate(12deg);
+    }
+
+    100%{
+        transform:scale(.1) rotate(45deg);
+        opacity:0;
+    }
+
+}
+
+@keyframes shard {
+
+    from{
+        transform:translate(0,0) scale(1);
+        opacity:1;
+    }
+
+    to{
+        transform:
+            translate(var(--dx),var(--dy))
+            rotate(360deg)
+            scale(.3);
+        opacity:0;
+    }
+
+}
+
+.particle{
+
+    position:absolute;
+    pointer-events:none;
+    font-size:18px;
+    animation:shard .55s forwards;
+
+}
+
+.overlay{
+
+    position:absolute;
+    inset:0;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:rgba(0,0,0,.75);
+
+    z-index:100;
+
+    opacity:0;
+    pointer-events:none;
+
+    transition:.3s;
+
+}
+
+.overlay.show{
+
+    opacity:1;
+    pointer-events:auto;
+
+}
+
+.overlay-box{
+
+    background:#101848;
+
+    border:6px solid white;
+
+    box-shadow:
+        inset 0 0 0 4px #555,
+        0 0 0 4px black;
+
+    padding:40px 60px;
+
+    text-align:center;
+
+}
+
+.overlay-title{
+
+    color:white;
+
+    font-size:24px;
+
+    margin-bottom:35px;
+
+    text-shadow:3px 3px #000;
+
+}
+
+#retryButton{
+
+    font-family:'Press Start 2P';
+
+    font-size:16px;
+
+    padding:18px 28px;
+
+    background:#ffe680;
+
+    border:4px solid white;
+
+    cursor:pointer;
+
+}
+
+#retryButton:hover{
+
+    transform:scale(1.05);
+
+}
+
+.cry-cat{
+
+    font-size:55px;
+
+    display:inline-block;
+
+    vertical-align:middle;
+
+    animation:cryShake .8s infinite;
+
+}
+
+
+@keyframes cryShake{
+
+    0%{
+        transform:translateY(0);
+    }
+
+    50%{
+        transform:translateY(-8px);
+    }
+
+    100%{
+        transform:translateY(0);
+    }
+
+}
+
+#winScreen,
+#storyEnd{
+
+    z-index:200;
+
+}
+
+
+#kissButton,
+#continueButton{
+
+    font-family:'Press Start 2P';
+
+    font-size:14px;
+
+    padding:18px;
+
+    background:#ffe680;
+
+    border:4px solid white;
+
+    cursor:pointer;
+
+}
+
+
+
+.heart{
+
+    position:absolute;
+
+    font-size:35px;
+
+    pointer-events:none;
+
+    animation:heartFly 2s forwards;
+
+}
+
+
+
+@keyframes heartFly{
+
+    from{
+
+        transform:translate(0,0) scale(1);
+
+        opacity:1;
+
+    }
+
+
+    to{
+
+        transform:
+        translate(
+        calc(var(--x)),
+        calc(var(--y))
+        )
+        scale(.2);
+
+        opacity:0;
+
+    }
+
+}
+
+
+
+.loveJump{
+
+    animation:jump .5s infinite alternate;
+
+}
+
+
+
+@keyframes jump{
+
+    from{
+
+        transform:translateY(0);
+
+    }
+
+    to{
+
+        transform:translateY(-25px);
+
+    }
+
+}
+
+#happyCat{
+
+    position:absolute;
+
+    font-size:55px;
+
+    left:-100px;
+    top:300px;
+
+    z-index:10;
+
+}
+
+.big-heart{
+
+    font-size:55px;
+
+    display:inline-block;
+
+    vertical-align:middle;
+
+    animation:heartBeat .8s infinite;
+
+}
+
+
+@keyframes heartBeat{
+
+    0%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.15);
+    }
+
+    100%{
+        transform:scale(1);
+    }
+
+}
+
+.transition-heart{
+
+    position:absolute;
+
+    pointer-events:none;
+
+    z-index:300;
+
+}
+
+</style>
+
+</head>
+
+
+
+
+<body>
+
+<div id="fadeScreen"></div>
+
+<div class="game">
+
+
+
+<!-- =====================
+     ИГРОВОЙ СЛОЙ
+===================== -->
+
+
+<div id="battleLayer">
+
+
+
+<div id="happyCat" class="cat">
+😼
+</div>
+
+<div id="cat" class="cat">
+
+🙀
+
+</div>
+
+<div id="timer">
+
+    <span class="timer-icon">⏳</span>
+
+    <span id="timerValue">30</span>
+
+</div>
+
+</div>
+
+<div id="gameOverScreen" class="overlay">
+
+    <div class="overlay-box">
+
+		<div class="overlay-title">
+			Котичка попалась 
+			<span class="cry-cat">😿</span>
+		</div>
+
+        <button id="retryButton">
+            Попробовать снова
+        </button>
+
+    </div>
+
+</div>
+
+<div id="winScreen" class="overlay">
+
+    <div class="overlay-box">
+
+		<div class="overlay-title" id="winTitle">
+		</div>
+
+		<button id="kissButton">
+		</button>
+
+    </div>
+
+</div>
+
+
+<div id="storyEnd" class="overlay">
+
+    <div class="overlay-box">
+
+        <div class="overlay-title">
+            Мур, спасибо <span class='big-heart'>❤️</span>
+        </div>
+
+        <button id="continueButton">
+            Продолжение нашей истории...
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================
+     ДИАЛОГОВЫЙ СЛОЙ
+===================== -->
+
+
+<div id="dialogLayer">
+
+
+
+
+
+<div class="character left" id="leftCharacter">
+
+
+<img id="leftPortrait">
+
+
+</div>
+
+<div class="character right" id="rightCharacter">
+
+
+<img id="rightPortrait">
+
+
+</div>
+
+
+
+
+
+
+
+<div class="dialogue">
+
+
+<div class="name" id="name">
+
+</div>
+
+
+
+<div class="text" id="text">
+
+</div>
+
+
+
+<div class="next">
+
+▼
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+<div class="hint">
+
+ENTER — продолжить
+
+</div>
+
+
+
+
+</div>
+
+
+
+
+
+</div>
+
+<audio id="loseOne" src="music/loseOne.mp3"></audio>
+<audio id="loseTwo" src="music/loseTwo.mp3"></audio>
+
+<audio id="vaseSound" src="music/vase.mp3"></audio>
+<audio id="boxSound" src="music/box.mp3"></audio>
+<audio id="plantSound" src="music/plant.mp3"></audio>
+
+
+<audio id="bgm" src="music/dialogBattleMusic.mp3" loop></audio>
+
+
+<audio id="winMusic" src="music/winMusic.mp3"></audio>
+<audio id="loveMusic" src="music/loveMusic.mp3"></audio>
+
+
+<audio id="typeSound" src="music/keyboard.mp3"></audio>
+
+
+
+
+<script>
+
+
+
+
+
+// ===============================
+// ДИАЛОГИ
+// ===============================
+
+
+const dialogues=[
+
+
+{
+    name:"Котичка",
+
+    img:"images/girl.png",
+
+    side:"left",
+
+    text:"Если я усну, ты сядешь мне на лицо, я умру!"
+
+},
+
+
+{
+    name:"Пчела",
+
+    img:"images/bee.png",
+
+    side:"right",
+
+    text:"Жужужу... я мирная пчелка. Хочу просто отдохнуть в теплой комнате."
+
+},
+
+
+{
+    name:"Котичка",
+
+    img:"images/girl.png",
+
+    side:"left",
+
+    text:"ААААААААААА! ОНА ПЫТАЕТСЯ МЕНЯ УБИТЬ!"
+
+}
+
+
+];
+
+
+
+
+// ===============================
+// ЭЛЕМЕНТЫ
+// ===============================
+const gameOverScreen =
+document.getElementById("gameOverScreen");
+
+const retryButton =
+document.getElementById("retryButton");
+
+const winScreen =
+document.getElementById("winScreen");
+
+const kissButton =
+document.getElementById("kissButton");
+
+const storyEnd =
+document.getElementById("storyEnd");
+
+const heroCat =
+document.getElementById("happyCat");
+
+const nameBox =
+document.getElementById("name");
+
+
+const textBox =
+document.getElementById("text");
+
+
+
+const leftPortrait =
+document.getElementById("leftPortrait");
+
+
+const rightPortrait =
+document.getElementById("rightPortrait");
+
+
+
+const leftCharacter =
+document.getElementById("leftCharacter");
+
+
+const rightCharacter =
+document.getElementById("rightCharacter");
+
+
+
+const bgm =
+document.getElementById("bgm");
+
+
+const typeSound =
+document.getElementById("typeSound");
+
+const dialogLayer =
+document.getElementById("dialogLayer");
+
+const timerValue =
+document.getElementById("timerValue");
+
+const winMusic = document.getElementById("winMusic");
+const loveMusic = document.getElementById("loveMusic");
+
+
+bgm.volume = 0.25;
+winMusic.volume = 0;
+loveMusic.volume = 0;
+
+
+function fadeMusic(from, to, duration = 1000){
+
+    const steps = 30;
+    const interval = duration / steps;
+
+    let current = 0;
+
+    const fromStart = from.volume;
+    const toStart = to.volume;
+
+    to.play().catch(()=>{});
+
+
+    let timer = setInterval(()=>{
+
+        current++;
+
+        let progress = current / steps;
+
+
+        from.volume = Math.max(
+            0,
+            fromStart * (1-progress)
+        );
+
+
+        to.volume =
+            Math.min(
+                0.25,
+                toStart + progress * 0.25
+            );
+
+
+        if(current >= steps){
+
+            clearInterval(timer);
+
+            from.pause();
+            from.currentTime = 0;
+
+            to.volume = 0.25;
+
+        }
+
+
+    }, interval);
+
+}
+
+
+// ===============================
+// СОСТОЯНИЕ
+// ===============================
+
+
+let dialogueIndex=0;
+
+
+let typing=false;
+
+
+let textTimer=null;
+
+let dialogueFinished = false;
+
+
+bgm.volume=.20;
+
+typeSound.volume=.25;
+
+
+
+
+// ===============================
+// МУЗЫКА
+// ===============================
+
+
+window.addEventListener("load",()=>{
+
+
+    bgm.play().catch(()=>{
+
+        console.log(
+        "Браузер ждёт взаимодействия"
+        );
+
+    });
+
+
+});
+
+
+
+const vaseSound = document.getElementById("vaseSound");
+const boxSound = document.getElementById("boxSound");
+const plantSound = document.getElementById("plantSound");
+
+const loseOne = document.getElementById("loseOne");
+const loseTwo = document.getElementById("loseTwo");
+
+function destroyObject(o){
+
+    // звук
+    if(o.innerHTML==="🏺"){
+        vaseSound.currentTime=0;
+        vaseSound.play();
+    }
+
+    if(o.innerHTML==="📦"){
+        boxSound.currentTime=0;
+        boxSound.play();
+    }
+
+    if(o.innerHTML==="🌱"){
+        plantSound.currentTime=0;
+        plantSound.play();
+    }
+
+    // небольшое увеличение перед исчезновением
+    o.style.animation="pop .25s forwards";
+
+    // частицы
+    let particleEmoji="✨";
+
+    if(o.innerHTML==="🏺") particleEmoji="✨";
+    if(o.innerHTML==="📦") particleEmoji="📄";
+    if(o.innerHTML==="🌱") particleEmoji="🍃";
+
+    for(let i=0;i<6;i++){
+
+        let p=document.createElement("div");
+
+        p.className="particle";
+        p.innerHTML=particleEmoji;
+
+        p.style.left=o.x+20+"px";
+        p.style.top=o.y+20+"px";
+
+        p.style.setProperty("--dx",(Math.random()*80-40)+"px");
+        p.style.setProperty("--dy",(Math.random()*80-40)+"px");
+
+        battleLayer.appendChild(p);
+
+        setTimeout(()=>p.remove(),550);
+
+    }
+
+    setTimeout(()=>o.remove(),250);
+
+}
+
+function showWinWindow(){
+
+    winScreen.classList.add("show");
+
+
+	document.getElementById("winTitle").innerHTML=
+	"Котька спасена <span class='big-heart'>❤️</span>";
+
+
+	kissButton.innerHTML=
+	"Поцеловать котьку!";
+
+
+}
+
+
+
+function showThanksWindow(){
+
+    storyEnd.classList.add("show");
+
+    document.querySelector(".overlay-title").innerHTML=
+    "Мур, спасибо ❤️";
+
+    retryButton.innerHTML=
+    "💖 Продолжить нашу историю";
+
+}
+
+function createHeart(x,y){
+
+    let h=document.createElement("div");
+
+    h.className="heart";
+
+    h.innerHTML="❤️";
+
+    h.style.left=x+"px";
+    h.style.top=y+"px";
+
+
+    h.style.setProperty(
+        "--x",
+        (Math.random()*200-100)+"px"
+    );
+
+
+    h.style.setProperty(
+        "--y",
+        (Math.random()*200-100)+"px"
+    );
+
+
+    battleLayer.appendChild(h);
+
+
+    setTimeout(()=>h.remove(),2000);
+
+}
+
+function playLoseSound(){
+
+    let sound;
+
+    if(Math.random() < 0.5){
+
+        sound = loseOne;
+
+    } else {
+
+        sound = loseTwo;
+
+    }
+
+
+    sound.currentTime = 0;
+
+    sound.play().catch(()=>{});
+
+}
+
+// ===============================
+// ЗВУК ПЕЧАТИ
+// ===============================
+
+
+function startTypeSound(){
+
+
+    typeSound.currentTime=0;
+
+
+    typeSound.play().catch(()=>{});
+
+
+}
+
+
+
+
+function stopTypeSound(){
+
+
+    typeSound.pause();
+
+
+    typeSound.currentTime=0;
+
+
+}
+
+
+
+
+
+
+
+// ===============================
+// ПОКАЗ ДИАЛОГА
+// ===============================
+
+
+function showDialogue(){
+
+    if(dialogueFinished)
+        return;
+
+
+    dialogLayer.classList.remove("hide");
+
+
+    clearInterval(textTimer);
+
+
+    const d=
+    dialogues[dialogueIndex];
+
+
+
+    nameBox.textContent=
+    d.name;
+
+
+
+    leftCharacter.classList.remove("active");
+
+    rightCharacter.classList.remove("active");
+
+
+
+
+
+    if(d.side==="left"){
+
+
+        leftPortrait.src=d.img;
+
+
+        leftCharacter.classList.add("active");
+
+
+    }
+
+    else{
+
+
+        rightPortrait.src=d.img;
+
+
+        rightCharacter.classList.add("active");
+
+
+    }
+
+
+
+
+
+
+    textBox.textContent="";
+
+
+
+    let pos=0;
+
+
+    typing=true;
+
+
+
+    startTypeSound();
+
+
+
+
+
+    textTimer=setInterval(()=>{
+
+
+
+        textBox.textContent +=
+        d.text[pos];
+
+
+
+        pos++;
+
+
+
+
+		if(pos>=d.text.length){
+
+
+			clearInterval(textTimer);
+
+
+			stopTypeSound();
+
+
+			typing=false;
+
+
+
+			// последний крик запускает битву
+
+			if(dialogueIndex===2){
+
+				endDialogueBattle();
+
+			}
+
+
+
+		}
+
+
+
+
+    },45);
+
+
+
+}
+
+
+
+
+
+
+
+// ===============================
+// ENTER
+// ===============================
+
+
+
+document.addEventListener("keydown",(e)=>{
+
+
+
+    if(e.key!=="Enter")
+    return;
+
+	if(dialogueFinished)
+    return;
+
+
+
+	if(typing){
+
+		clearInterval(textTimer);
+
+		stopTypeSound();
+
+		textBox.textContent =
+		dialogues[dialogueIndex].text;
+
+		typing=false;
+
+
+		if(dialogueIndex===2){
+
+			endDialogueBattle();
+
+		}
+
+
+		return;
+
+	}
+
+
+
+
+
+
+    dialogueIndex++;
+
+
+
+
+
+    if(dialogueIndex>=dialogues.length){
+
+
+
+        dialogueIndex=0;
+
+
+        // пока ничего не делаем
+        // тут позже включим событие игры
+
+
+
+        return;
+
+
+    }
+
+
+
+    showDialogue();
+
+
+
+});
+
+
+
+
+
+showDialogue();
+
+// ===============================
+// ИГРА НА ФОНЕ
+// ===============================
+
+
+const battleLayer =
+document.getElementById("battleLayer");
+
+
+const cat =
+document.getElementById("cat");
+
+
+
+let catX = 400;
+let catY = 300;
+
+cat.style.left = catX + "px";
+cat.style.top = catY + "px";
+
+let finalScene=false;
+
+let finalPhase=0;
+
+const centerY = 300;
+
+const happyStart = {
+    x: 950,
+    y: centerY
+};
+
+const happyTarget = {
+    x: 560,
+    y: centerY
+};
+
+
+let cryingTarget = {
+    x: 340,
+    y: centerY
+};
+
+let happyX=-100;
+let happyY=300;
+
+let catRunningX=catX;
+let catRunningY=catY;
+
+
+// точки встречи
+
+let keys={};
+
+
+let bees=[];
+
+
+let objects=[];
+
+
+let running=true;
+
+
+// управление закрыто до конца диалога
+let battleStarted=false;
+
+
+// пчела пока просто кружится
+let beeAggressive=false;
+
+let canRestart = false;
+
+let time=30;
+
+
+
+
+
+// ===============================
+// УПРАВЛЕНИЕ
+// ===============================
+
+
+document.addEventListener("keydown",(e)=>{
+
+
+    keys[e.key.toLowerCase()]=true;
+
+
+});
+
+
+
+document.addEventListener("keyup",(e)=>{
+
+
+    keys[e.key.toLowerCase()]=false;
+
+
+});
+
+
+
+
+
+// ===============================
+// СОЗДАНИЕ ПЧЕЛЫ
+// ===============================
+
+
+function createBee(first=false){
+
+    let b=document.createElement("div");
+
+    b.className="bee";
+
+    b.innerHTML="🐝";
+
+
+    if(first){
+
+        // первая пчела напротив кота
+
+        b.centerX = 500;
+        b.centerY = 300;
+
+        b.radius = 80;
+
+        b.angle = 0;
+		b.wobble = 0;
+
+        b.x = b.centerX + b.radius;
+        b.y = b.centerY;
+
+
+    } else {
+
+
+        // остальные пчёлы случайно
+
+        b.x = Math.random()*800;
+
+        b.y = 100 + Math.random()*400;
+
+
+        // для случайных тоже сохраняем точку кружения
+
+        b.centerX = b.x;
+        b.centerY = b.y;
+
+
+        b.radius = 30 + Math.random()*70;
+
+        b.angle = Math.random()*Math.PI*2;
+
+		b.wobble = Math.random() * Math.PI * 2;
+    }
+
+
+
+    battleLayer.appendChild(b);
+
+
+    b.style.left=b.x+"px";
+    b.style.top=b.y+"px";
+
+
+    bees.push(b);
+
+}
+
+
+function startBattle(){
+
+    battleStarted=true;
+
+    beeAggressive=true;
+
+    time=30;
+
+    timerValue.textContent=time;
+
+
+	bgm.volume = MUSIC_VOLUME;
+
+	if(bgm.paused){
+		bgm.play().catch(()=>{});
+	}
+
+	currentMusic = bgm;
+
+}
+
+
+
+
+// ===============================
+// СОЗДАНИЕ ПРЕДМЕТОВ
+// ===============================
+
+
+function createObject(){
+
+
+    let list=[
+
+        "🏺",
+
+        "📦",
+
+        "🌱"
+
+    ];
+
+
+
+    let o=document.createElement("div");
+
+
+
+    o.className="object";
+
+
+    o.innerHTML=
+    list[
+    Math.floor(Math.random()*list.length)
+    ];
+
+
+
+    o.x=Math.random()*800;
+
+
+    o.y=100+Math.random()*400;
+
+
+
+    o.style.left=o.x+"px";
+
+    o.style.top=o.y+"px";
+
+
+
+    battleLayer.appendChild(o);
+
+
+
+    objects.push(o);
+
+
+
+}
+
+
+
+
+
+
+
+
+// ===============================
+// ОСНОВНОЙ ЦИКЛ
+// ===============================
+
+function endDialogueBattle(){
+
+	dialogueFinished = true;
+
+    setTimeout(()=>{
+
+        dialogLayer.classList.add("hide");
+
+    },500);
+
+
+    setTimeout(()=>{
+
+        startBattle();
+
+    },1500);
+
+}
+
+function createBaseObjects(){
+
+    let positions = [
+
+        [100,150],
+        [250,450],
+        [700,120],
+        [750,400],
+        [500,500],
+        [150,350]
+
+    ];
+	
+	let list=[
+
+        "🏺",
+
+        "📦",
+
+        "🌱"
+
+    ];
+
+
+    positions.forEach(pos=>{
+
+        let o=document.createElement("div");
+
+        o.className="object";
+
+		o.innerHTML=
+		list[
+		Math.floor(Math.random()*list.length)
+		];
+
+
+        o.x=pos[0];
+        o.y=pos[1];
+
+
+        o.style.left=o.x+"px";
+        o.style.top=o.y+"px";
+
+
+        battleLayer.appendChild(o);
+
+
+        objects.push(o);
+
+    });
+
+}
+
+
+function updateBattle(){
+
+    requestAnimationFrame(updateBattle);
+
+    if (!running)
+        return;
+
+    if (!battleStarted)
+        return;
+
+let moving=false;
+
+
+
+
+if(keys["w"] || keys["arrowup"]){
+
+
+    catY-=5;
+
+    moving=true;
+
+}
+
+
+
+
+if(keys["s"] || keys["arrowdown"]){
+
+
+    catY+=5;
+
+    moving=true;
+
+}
+
+
+
+
+if(keys["a"] || keys["arrowleft"]){
+
+
+    catX-=5;
+
+    moving=true;
+
+}
+
+
+
+
+if(keys["d"] || keys["arrowright"]){
+
+
+    catX+=5;
+
+    moving=true;
+
+}
+
+
+
+
+const maxX = battleLayer.clientWidth - cat.offsetWidth;
+const maxY = battleLayer.clientHeight - cat.offsetHeight;
+
+catX = Math.max(0, Math.min(maxX, catX));
+catY = Math.max(0, Math.min(maxY, catY));
+
+
+
+
+
+cat.style.left=
+catX+"px";
+
+
+cat.style.top=
+catY+"px";
+
+
+
+
+
+// =====================
+// ПЧЕЛЫ
+// =====================
+
+
+bees.forEach(b=>{
+
+    let dx = catX - b.x;
+    let dy = catY - b.y;
+
+    let dist = Math.sqrt(dx*dx + dy*dy);
+
+
+    if(beeAggressive){
+
+		if (dist > 0) {
+
+			b.wobble += 0.25;
+
+			const nx = dx / dist;
+			const ny = dy / dist;
+
+			// Перпендикуляр к направлению
+			const px = -ny;
+			const py = nx;
+
+			// Сила виляния
+			const wobble = Math.sin(b.wobble) * 2.5;
+
+			b.x += nx * 1.6 + px * wobble;
+			b.y += ny * 1.6 + py * wobble;
+		}
+
+		} else {
+
+			b.angle += 0.05;
+
+			b.x += Math.cos(b.angle) * 1.5;
+			b.y += Math.sin(b.angle) * 1.5;
+
+		}
+
+
+    b.style.left = b.x + "px";
+    b.style.top = b.y + "px";
+
+
+    if(dist < 45){
+
+        loseGame();
+
+    }
+
+});
+
+}
+
+
+
+
+
+
+
+
+// ===============================
+// ПРОВЕРКА ПРЕДМЕТОВ
+// ===============================
+
+
+setInterval(()=>{
+
+
+if(!running || !battleStarted)
+return;
+
+
+
+objects.forEach((o,i)=>{
+
+
+
+    let dx=
+    catX-o.x;
+
+
+
+    let dy=
+    catY-o.y;
+
+
+
+
+    let d=
+    Math.sqrt(dx*dx+dy*dy);
+
+
+
+
+    if(d<60){
+
+
+
+        destroyObject(o);
+
+
+
+        objects.splice(i,1);
+
+
+
+    }
+
+
+
+});
+
+
+
+},100);
+
+
+
+
+
+
+
+
+// ===============================
+// ПОБЕДА
+// ===============================
+
+
+function winGame(){
+
+    running=false;
+
+    finalScene=true;
+
+    battleStarted=false;
+
+
+	switchMusic(winMusic);
+
+
+    startFinalScene();
+
+}
+
+const MUSIC_VOLUME = 0.25;
+
+[
+    bgm,
+    winMusic,
+    loveMusic
+].forEach(a=>{
+
+    a.volume = 0;
+    a.loop = true;
+
+});
+
+let currentMusic = bgm;
+
+bgm.volume = MUSIC_VOLUME;
+
+function switchMusic(next, duration = 1500){
+
+    if(currentMusic === next)
+        return;
+
+    next.currentTime = 0;
+    next.volume = 0;
+    next.play().catch(()=>{});
+
+    const interval = 50;
+    const steps = duration / interval;
+
+    let step = 0;
+
+    const from = currentMusic;
+
+    const timer = setInterval(()=>{
+
+        step++;
+
+        const p = step / steps;
+
+        if(from){
+
+            from.volume =
+                MUSIC_VOLUME * (1 - p);
+
+        }
+
+        next.volume =
+            MUSIC_VOLUME * p;
+
+        if(step >= steps){
+
+            clearInterval(timer);
+
+            if(from){
+
+                from.pause();
+                from.currentTime = 0;
+                from.volume = 0;
+
+            }
+
+            next.volume = MUSIC_VOLUME;
+            currentMusic = next;
+
+        }
+
+    },interval);
+
+}
+
+function setCatPosition(element,x,y){
+
+    element.style.left =
+    (x - element.offsetWidth / 2) + "px";
+
+    element.style.top =
+    (y - element.offsetHeight / 2) + "px";
+
+}
+
+function startFinalScene(){
+
+
+    // пчёлы улетают
+
+    bees.forEach(b=>{
+
+        let angle=Math.random()*Math.PI*2;
+
+        b.escapeVX=Math.cos(angle)*8;
+        b.escapeVY=Math.sin(angle)*8;
+
+        b.flyAway=true;
+
+    });
+
+
+
+    // ставим счастливого кота за экраном
+
+	happyX = happyStart.x;
+	happyY = happyStart.y;
+
+	setCatPosition(
+		heroCat,
+		happyX,
+		happyY
+	);
+
+
+
+    // возвращаем плачущего кота
+    // в игровую позицию
+
+	catRunningX = catX + cat.offsetWidth / 2;
+	catRunningY = catY + cat.offsetHeight / 2;
+
+	cryingTarget.x = happyTarget.x - 200;
+	cryingTarget.y = happyTarget.y;
+
+    finalPhase=0;
+
+
+    requestAnimationFrame(finalAnimation);
+
+}
+
+function finalAnimation(){
+
+
+/*
+=====================
+ФАЗА 1
+ПЧЁЛЫ УЛЕТАЮТ
+=====================
+*/
+
+
+if(finalPhase===0){
+
+
+    let gone=true;
+
+
+    bees.forEach(b=>{
+
+
+        b.x+=b.escapeVX;
+        b.y+=b.escapeVY;
+
+
+        b.style.left=b.x+"px";
+        b.style.top=b.y+"px";
+
+
+        if(
+            b.x>-100 &&
+            b.x<1000 &&
+            b.y>-100 &&
+            b.y<700
+        ){
+
+            gone=false;
+updateBattle
+        }
+
+    });
+
+
+
+    if(gone){
+
+        finalPhase=1;
+
+    }
+
+
+    requestAnimationFrame(finalAnimation);
+
+    return;
+
+}
+
+
+
+
+
+/*
+=====================
+ФАЗА 2
+УСМЕХАЮЩИЙСЯ КОТ БЕЖИТ
+=====================
+*/
+
+
+if(finalPhase===1){
+
+    let happyDx = happyTarget.x - happyX;
+
+
+    if(Math.abs(happyDx)>3){
+
+        happyX += happyDx * 0.02;
+
+    }
+    else{
+
+        happyX = happyTarget.x;
+
+    }
+
+
+    setCatPosition(
+        heroCat,
+        happyX,
+        happyY
+    );
+
+
+
+    let cryDx = cryingTarget.x - catRunningX;
+    let cryDy = cryingTarget.y - catRunningY;
+
+
+    let cryDistance = Math.sqrt(
+        cryDx*cryDx + cryDy*cryDy
+    );
+
+
+    if(cryDistance>3){
+
+        catRunningX += cryDx * 0.02;
+        catRunningY += cryDy * 0.02;
+
+    }
+    else{
+
+        catRunningX = cryingTarget.x;
+        catRunningY = cryingTarget.y;
+
+    }
+
+
+    setCatPosition(
+        cat,
+        catRunningX,
+        catRunningY
+    );
+
+
+
+    // оба дошли
+    if(
+        Math.abs(happyX-happyTarget.x)<3 &&
+        cryDistance<3
+    ){
+
+        finalPhase=3;
+
+    }
+
+
+    requestAnimationFrame(finalAnimation);
+
+    return;
+
+}
+
+
+
+
+/*
+=====================
+ФАЗА 4
+СТОЯТ РЯДОМ
+=====================
+*/
+
+
+if(finalPhase===3){
+
+    setCatPosition(
+        cat,
+        cryingTarget.x,
+        cryingTarget.y
+    );
+
+    setCatPosition(
+        heroCat,
+        happyTarget.x,
+        happyTarget.y
+    );
+	
+    cat.innerHTML="🙀";
+
+    heroCat.innerHTML="😼";
+
+
+    createHearts();
+
+
+    showWinWindow();
+
+
+    finalPhase=4;
+
+
+}
+
+}
+
+function createHearts(){
+
+    for(let i=0;i<30;i++){
+
+        let h=document.createElement("div");
+
+        h.innerHTML="❤️";
+
+        h.style.position="absolute";
+        h.style.fontSize="30px";
+
+        h.style.left=
+        (350+Math.random()*120)+"px";
+
+        h.style.top=
+        (250+Math.random()*100)+"px";
+
+
+        h.animate(
+        [
+            {
+                transform:"translateY(0)",
+                opacity:1
+            },
+            {
+                transform:
+                "translateY(-200px)",
+                opacity:0
+            }
+
+        ],
+        {
+            duration:1500
+        });
+
+
+        battleLayer.appendChild(h);
+
+
+        setTimeout(()=>h.remove(),1500);
+
+    }
+
+}
+
+
+// ===============================
+// ПРОИГРЫШ
+// ===============================
+function stopMusic(audio){
+
+    audio.pause();
+    audio.currentTime = 0;
+    audio.volume = 0.25;
+
+}
+
+function loseGame() {
+
+    if(!running) return;
+
+
+    running = false;
+
+    battleStarted = false;
+
+    canRestart = true;
+
+
+    stopMusic(bgm);
+
+
+    playLoseSound();
+
+
+    gameOverScreen.classList.add("show");
+
+}
+
+function resetGame(){
+
+	if(!canRestart) return;
+	
+	kissButton.disabled = false;
+    canRestart = false;
+	
+    gameOverScreen.classList.remove("show");
+
+    running = true;
+    battleStarted = false;
+    beeAggressive = false;
+
+    time = 30;
+    timerValue.textContent = time;
+
+    catX = 400;
+    catY = 300;
+
+    cat.style.left = catX + "px";
+    cat.style.top = catY + "px";
+
+    bees.forEach(b=>b.remove());
+    bees=[];
+
+    objects.forEach(o=>o.remove());
+    objects=[];
+
+    createBee(true);
+    createBaseObjects();
+
+    startBattle();
+}
+
+
+
+
+// ===============================
+// ТАЙМЕР
+// ===============================
+
+
+setInterval(()=>{
+
+
+
+if(!running || !battleStarted)
+return;
+
+
+
+time--;
+
+timerValue.textContent=time;
+
+
+
+
+if(time%5===0){
+
+
+    createBee();
+
+
+}
+
+
+
+
+if(time%3===0){
+
+
+    createObject();
+
+
+}
+
+
+
+
+
+if(time<=0){
+
+
+
+    winGame();
+
+
+}
+
+
+
+},1000);
+
+
+
+
+
+
+
+
+// ===============================
+// ЗАПУСК
+// ===============================
+kissButton.addEventListener(
+"click",
+()=>{
+
+	kissButton.disabled = true;
+	
+	switchMusic(loveMusic);
+	
+    winScreen.classList.remove("show");
+	
+
+    // превращаем котов в влюбленных
+    setTimeout(()=>{
+
+        cat.innerHTML = "😻";
+        heroCat.innerHTML = "😻";
+
+        cat.classList.add("loveJump");
+        heroCat.classList.add("loveJump");
+
+
+    },800);
+
+
+
+    let hearts=setInterval(()=>{
+
+
+        createHeart(
+            450+Math.random()*100,
+            300+Math.random()*100
+        );
+
+
+    },150);
+
+
+
+    setTimeout(()=>{
+
+
+        clearInterval(hearts);
+
+
+        storyEnd.classList.add("show");
+
+
+    },4000);
+
+
+
+});
+
+
+continueButton.addEventListener("click",()=>{
+
+    storyEnd.classList.remove("show");
+
+    const hearts = setInterval(()=>{
+
+    let heart = document.createElement("div");
+
+    heart.className="transition-heart";
+
+    heart.innerHTML=[
+        "❤️",
+        "💖",
+        "💕",
+        "💗",
+        "💓"
+    ][Math.floor(Math.random()*5)];
+
+    heart.style.left =
+        Math.random()*battleLayer.clientWidth + "px";
+
+    heart.style.top =
+        battleLayer.clientHeight + 40 + "px";
+
+    heart.style.fontSize =
+        (20+Math.random()*40)+"px";
+
+    heart.animate(
+
+        [
+
+            {
+                transform:"translateY(0) scale(.5)",
+                opacity:1
+            },
+
+            {
+                transform:"translateY(-750px) scale(1.5) rotate(360deg)",
+                opacity:0
+            }
+
+        ],
+
+        {
+
+            duration:3000,
+            easing:"linear"
+
+        }
+
+    );
+
+    battleLayer.appendChild(heart);
+
+    setTimeout(()=>heart.remove(),3000);
+
+},120);
+
+	storyEnd.classList.remove("show");
+
+	const fade = document.getElementById("fadeScreen");
+    // Сердечки летят 5 секунд
+    setTimeout(()=>{
+
+        fadeScreen.classList.add("show");
+
+    },5000);
+
+    // Затемнение длится 2.5 секунды
+    setTimeout(()=>{
+
+        clearInterval(hearts);
+
+        window.location.href="fourthScreen.html";
+
+    },7500);
+
+});
+
+retryButton.addEventListener("click", resetGame);
+
+createBee(true);
+
+createBaseObjects();
+
+updateBattle();
+
+
+</script>
+
+
+
+</body>
+
+</html>

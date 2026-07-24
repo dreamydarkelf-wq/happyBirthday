@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Подарок ❤️</title>
+
+<style>
+
+* {
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    background:linear-gradient(180deg,#ffe7ef,#ffd2e5);
+    overflow:hidden;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+
+.gift-scene {
+    position:relative;
+    width:320px;
+    height:420px;
+    display:flex;
+    justify-content:center;
+    align-items:flex-end;
+}
+
+#box {
+    width:220px;
+    z-index:2;
+    user-select:none;
+}
+
+
+#bond {
+    position:absolute;
+    width:170px;
+    bottom:80px;
+    opacity:0;
+    transform:translateY(40px) scale(.3);
+    z-index:10;
+}
+
+
+
+#loveText {
+
+    position:absolute;
+
+    left:50%;
+    bottom:-150px;
+
+    width:max-content;
+
+    transform:
+        translateX(-50%)
+        translateY(30px)
+        scale(.8);
+
+    opacity:0;
+
+    font-size:64px;
+    font-weight:bold;
+
+    color:#ff2f74;
+
+    white-space:nowrap;
+
+    text-align:center;
+
+    z-index:20;
+
+    text-shadow:
+    0 0 10px rgba(255,0,90,.4),
+    0 0 25px rgba(255,0,90,.25);
+}
+
+
+
+.showText {
+
+    animation:
+    showText .8s ease forwards;
+
+}
+
+
+@keyframes showText {
+
+    from {
+
+        opacity:0;
+
+        transform:
+        translateX(-50%)
+        translateY(30px)
+        scale(.8);
+
+    }
+
+
+    to {
+
+        opacity:1;
+
+        transform:
+        translateX(-50%)
+        translateY(0)
+        scale(1);
+
+    }
+
+}
+
+
+
+
+.heart {
+
+    display:inline-block;
+
+    animation:
+    heartJump .8s infinite;
+
+}
+
+
+
+.words {
+
+    display:inline-block;
+
+    animation:
+    textBeat 1s infinite 1s;
+
+}
+
+
+
+@keyframes heartJump {
+
+
+0%,100% {
+
+    transform:
+    translateY(0)
+    scale(1);
+
+}
+
+
+25% {
+
+    transform:
+    translateY(-10px)
+    scale(1.25);
+
+}
+
+
+50% {
+
+    transform:
+    translateY(0)
+    scale(1);
+
+}
+
+
+}
+
+
+
+@keyframes textBeat {
+
+
+0%,100% {
+
+    transform:scale(1);
+
+}
+
+
+15% {
+
+    transform:scale(1.08);
+
+}
+
+
+30% {
+
+    transform:scale(1);
+
+}
+
+
+45% {
+
+    transform:scale(1.12);
+
+}
+
+
+60% {
+
+    transform:scale(1);
+
+}
+
+
+}
+
+
+
+
+.fly {
+
+animation:
+fly 2s cubic-bezier(.2,.9,.3,1) forwards;
+
+}
+
+
+
+@keyframes fly {
+
+
+0% {
+
+    opacity:0;
+
+    transform:
+    translateY(50px)
+    scale(.3);
+
+}
+
+
+25% {
+
+    opacity:1;
+
+    transform:
+    translateY(-60px)
+    scale(.9);
+
+}
+
+
+50% {
+
+    transform:
+    translateY(-130px)
+    scale(1.5);
+
+}
+
+
+
+65% {
+
+    transform:
+    translateY(-105px)
+    scale(1.35);
+
+}
+
+
+
+80% {
+
+    transform:
+    translateY(-160px)
+    scale(2.4);
+
+}
+
+
+
+100% {
+
+    opacity:1;
+
+    transform:
+    translateY(-150px)
+    scale(3.2);
+
+}
+
+
+}
+
+#startButton{
+    position:fixed;
+    left:50%;
+    bottom:80px;
+    transform:translateX(-50%);
+
+    padding:18px 40px;
+
+    border-radius:18px;
+
+    background:#ff4f81;
+    color:#fff;
+
+    font-size:38px;
+    font-weight:bold;
+
+    cursor:pointer;
+
+    user-select:none;
+
+    box-shadow:
+        0 10px 30px rgba(255,79,129,.4);
+
+    animation:pulse 1.2s infinite;
+    transition:.3s;
+}
+
+#startButton:hover{
+    transform:translateX(-50%) scale(1.05);
+}
+
+#startButton.hide{
+    opacity:0;
+    pointer-events:none;
+}
+
+@keyframes pulse{
+
+    0%,100%{
+        transform:translateX(-50%) scale(1);
+    }
+
+    50%{
+        transform:translateX(-50%) scale(1.08);
+    }
+
+}
+
+#hint{
+    position:absolute;
+    left:50%;
+    top:-70px;
+
+    transform:translateX(-50%);
+
+    font-size:42px;
+    font-weight:bold;
+
+    color:#ff2f74;
+
+    white-space:nowrap;
+
+    text-shadow:
+        0 0 12px rgba(255,0,90,.5);
+
+    animation:hintPulse 1.2s infinite;
+}
+
+#hint.hide{
+    opacity:0;
+    transition:.4s;
+}
+
+#box{
+    width:220px;
+    z-index:2;
+    cursor:pointer;
+    user-select:none;
+}
+
+@keyframes hintPulse{
+
+    0%,100%{
+        transform:translateX(-50%) scale(1);
+    }
+
+    50%{
+        transform:translateX(-50%) scale(1.08);
+    }
+
+}
+
+.flying-heart{
+    position:fixed;
+    left:0;
+    bottom:-60px;
+
+    pointer-events:none;
+    user-select:none;
+
+    z-index:9999;
+
+    animation: floatHeart linear forwards;
+    will-change: transform, opacity;
+}
+
+@keyframes floatHeart{
+
+    0%{
+        opacity:0;
+        transform:
+            translate(0,0)
+            rotate(0deg)
+            scale(.6);
+    }
+
+    10%{
+        opacity:1;
+    }
+
+    25%{
+        transform:
+            translate(-40px,-25vh)
+            rotate(-40deg)
+            scale(.8);
+    }
+
+    50%{
+        transform:
+            translate(35px,-50vh)
+            rotate(60deg)
+            scale(1);
+    }
+
+    75%{
+        transform:
+            translate(-25px,-75vh)
+            rotate(-30deg)
+            scale(1.15);
+    }
+
+    100%{
+        opacity:0;
+        transform:
+            translate(20px,-115vh)
+            rotate(120deg)
+            scale(1.3);
+    }
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<audio id="loveMusic" loop>
+    <source src="music/final.mp3" type="audio/mpeg">
+</audio>
+<audio id="openBoxSound">
+    <source src="music/openBox.mp3" type="audio/mpeg">
+</audio>
+
+<div class="gift-scene">
+
+<div id="hint">Открой меня!</div>
+<img id="box" src="images/box/sprite1.png">
+
+
+<img id="bond" src="images/bond.png">
+
+
+<div id="loveText">
+
+<span class="heart">❤️</span>
+
+<span class="words">
+Люблю тебя
+</span>
+
+<span class="heart">❤️</span>
+
+</div>
+
+
+</div>
+
+
+
+<script>
+
+
+const box =
+document.getElementById("box");
+
+
+const bond =
+document.getElementById("bond");
+
+
+const text =
+document.getElementById("loveText");
+
+const loveMusic = document.getElementById("loveMusic");
+const openBoxSound = document.getElementById("openBoxSound");
+
+const startButton = document.getElementById("startButton");
+const hint = document.getElementById("hint");
+let opened = false;
+const frames = [
+
+"images/box/sprite1.png",
+
+"images/box/sprite2.png",
+
+"images/box/sprite3.png",
+
+"images/box/sprite2.png",
+
+"images/box/sprite3.png",
+
+"images/box/sprite2.png",
+
+"images/box/sprite3.png",
+
+"images/box/sprite4.png",
+
+"images/box/sprite5.png",
+
+"images/box/sprite6.png",
+
+"images/box/sprite7.png"
+
+];
+
+
+
+let frame=0;
+
+function startHeartRain(duration = 180000){
+
+    const emojis = ["❤️","💖","💕","💗","💓","💘"];
+
+    const interval = setInterval(()=>{
+
+        const heart = document.createElement("div");
+
+        heart.className = "flying-heart";
+
+        heart.textContent =
+            emojis[Math.floor(Math.random()*emojis.length)];
+
+        heart.style.left =
+            Math.random()*100 + "vw";
+
+        heart.style.fontSize =
+            (22 + Math.random()*34) + "px";
+
+        heart.style.animationDuration =
+            (5 + Math.random()*4) + "s";
+
+        document.body.appendChild(heart);
+
+        heart.addEventListener("animationend",()=>{
+            heart.remove();
+        });
+
+    },250);
+
+    setTimeout(()=>{
+        clearInterval(interval);
+    },duration);
+
+}
+
+function openGift() {
+
+    // Сразу показываем первый кадр открытия
+    frame = 1;
+    box.src = frames[frame];
+
+    // Одновременно запускаем звук
+    openBoxSound.currentTime = 0;
+    openBoxSound.volume = 0.6;
+    openBoxSound.play().catch(() => {});
+
+    frame++;
+
+    const timer = setInterval(() => {
+
+        box.src = frames[frame];
+        frame++;
+
+        if (frame >= frames.length) {
+
+            clearInterval(timer);
+
+            bond.classList.add("fly");
+
+            setTimeout(() => {
+
+                text.classList.add("showText");
+
+                loveMusic.volume = 0.25;
+                loveMusic.play().catch(() => {
+                    console.log("Автовоспроизведение запрещено браузером");
+                });
+				startHeartRain(180000);
+
+            }, 2000);
+        }
+
+    }, 170);
+
+}
+
+
+
+
+box.onclick = () => {
+
+    if (opened) return;
+
+    opened = true;
+
+    hint.classList.add("hide");
+
+    box.style.cursor = "default";
+
+    openGift();
+
+};
+
+
+
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Наша история ❤️</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    background:
+    linear-gradient(
+        180deg,
+        #3d1018 0%,
+        #701b2b 45%,
+        #9b3042 100%
+    );
+
+    color:#f5f5f5;
+
+    font-family:"Segoe UI", sans-serif;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+
+    padding:40px 20px 100px;
+
+    overflow-x:hidden;
+
+}
+
+.cursor{
+
+    display:inline-block;
+
+    width:2px;
+
+    animation:blink .8s infinite;
+
+}
+
+@keyframes blink{
+
+    50%{
+
+        opacity:0;
+
+    }
+
+}
+
+.image-container{
+
+    opacity:0;
+
+    transform:scale(.97);
+
+    transition:1.5s;
+
+}
+
+.image-container.show{
+
+    opacity:1;
+
+    transform:scale(1);
+
+}
+
+.image-container img{
+
+    width:100%;
+    max-width:1536px;
+    height:auto;
+
+    border-radius:20px;
+
+    box-shadow:none;
+
+}
+
+.text{
+
+    width:min(900px,90%);
+
+    margin-top:60px;
+
+    font-size:28px;
+
+    line-height:1.8;
+
+}
+
+.paragraph{
+
+    opacity:0;
+
+    transform:translateY(30px);
+
+    transition:1.2s;
+
+    margin-bottom:38px;
+
+}
+
+.paragraph.show{
+
+    opacity:1;
+
+    transform:translateY(0);
+
+}
+
+.heart-block{
+
+    opacity:0;
+
+    margin-top:70px;
+
+    text-align:center;
+
+    transition:2s;
+
+}
+
+.heart-block.show{
+
+    opacity:1;
+
+}
+
+.heart{
+
+    display:inline-block;
+
+    font-size:5rem;
+
+    cursor:pointer;
+
+    user-select:none;
+
+    animation:heartBeat 1.3s infinite;
+
+}
+
+@keyframes heartBeat{
+
+    0%,100%{
+
+        transform:scale(1);
+
+        filter:
+        drop-shadow(0 0 5px #ff4f81);
+
+    }
+
+    50%{
+
+        transform:scale(1.25);
+
+        filter:
+        drop-shadow(0 0 25px #ff4f81);
+
+    }
+
+}
+
+.heart-text{
+
+    margin-top:15px;
+
+    font-size:1.2rem;
+
+    color:#ffc4d6;
+
+    font-weight:bold;
+
+}
+
+.heart:active{
+
+    transform:scale(0.9);
+
+}
+
+.fade-screen{
+
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:100%;
+    height:100%;
+
+    background:#000;
+
+    opacity:0;
+
+    pointer-events:none;
+
+    transition:opacity 1.5s ease;
+
+    z-index:999;
+
+}
+
+.fade-screen.active{
+
+    opacity:1;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="fade-screen"></div>
+
+<div class="image-container" id="image">
+
+    <img src="images/together.png" alt="Наш вечер вместе">
+
+</div>
+
+<div class="text" id="text"></div>
+
+<div class="heart-block" id="heartBlock">
+
+    <div class="heart">
+        ❤️
+    </div>
+
+    <p class="heart-text">
+        Продолжение нашей истории...
+    </p>
+
+</div>
+
+<audio id="bgMusic" loop>
+
+    <source src="music/together.mp3" type="audio/mpeg">
+
+</audio>
+
+<script>
+
+const paragraphs = [
+
+`Я кайфую от наших домашних посиделок под рилсики и шортсы с вечными милыми котиками, качками и видосиками про отношения, кайфую от вечерних мурчаний под бесконечные игры, когда мы можем одновременно наслаждаться и страдать вместе, кайфую от просмотра кино, обсуждая каждое странное действие героев и то, как бы мы поступили на их месте, кайфую от готовки, когда у нас получается что-то невероятно вкусное, да и когда получается не очень вкусно тоже кайфую.`,
+
+`Каждое из этих занятий обычное, простое, но именно ты их наполняешь радостью и безумным весельем, создаёшь по-настоящему домашний уют, особую атмосферу и чувство спокойствия, делаешь моменты по-настоящему яркими и запоминающимися.`,
+
+`С тобой любые мелочи становятся особенными :3`,
+
+`Раз уж мы вспомнили столько классных моментов...`
+
+];
+
+const image=document.getElementById("image");
+const text=document.getElementById("text");
+const heartBlock=document.getElementById("heartBlock");
+const music=document.getElementById("bgMusic");
+
+function fadeOutMusic(duration = 2000) {
+
+    const interval = 50;
+    const step = music.volume / (duration / interval);
+
+    const fade = setInterval(() => {
+
+        if (music.volume > step) {
+            music.volume -= step;
+        } else {
+            music.volume = 0;
+            clearInterval(fade);
+        }
+
+    }, interval);
+
+}
+
+window.addEventListener("load",()=>{
+
+    if(localStorage.getItem("audioUnlocked")==="true"){
+
+        music.volume=0.25;
+
+        music.play().catch(()=>{
+
+            console.log("Автовоспроизведение запрещено браузером");
+
+        });
+
+    }
+
+});
+
+setTimeout(()=>{
+
+    image.classList.add("show");
+
+},500);
+
+setTimeout(async()=>{
+
+    for(const paragraph of paragraphs){
+
+        await typeParagraph(paragraph);
+
+        await sleep(1800);
+
+    }
+
+    await sleep(1000);
+
+    heartBlock.classList.add("show");
+
+},2500);
+
+function sleep(ms){
+
+    return new Promise(resolve=>setTimeout(resolve,ms));
+
+}
+
+async function typeParagraph(textValue){
+
+    const p=document.createElement("div");
+
+    p.className="paragraph show";
+
+    text.appendChild(p);
+
+    const cursor=document.createElement("span");
+
+    cursor.className="cursor";
+
+    cursor.textContent="|";
+
+    p.appendChild(cursor);
+
+    for(let i=0;i<textValue.length;i++){
+
+        cursor.insertAdjacentText(
+            "beforebegin",
+            textValue[i]
+        );
+
+        await sleep(42);
+
+    }
+
+    cursor.remove();
+
+}
+
+document.querySelector(".heart").onclick = () => {
+
+
+    const heart = document.querySelector(".heart");
+
+
+    heart.style.transform = "scale(1.5)";
+
+
+    fadeOutMusic(2000);
+
+
+
+    setTimeout(() => {
+
+
+        document
+        .querySelector(".fade-screen")
+        .classList.add("active");
+
+
+    },500);
+
+
+
+    setTimeout(() => {
+
+
+        window.location.href = "SeventhScreen.html";
+
+
+    },2000);
+
+
+};
+
+</script>
+
+</body>
+</html>

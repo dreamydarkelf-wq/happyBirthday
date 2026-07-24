@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Начало ❤️</title>
+
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+
+body{
+
+    height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    overflow:hidden;
+
+
+    font-family:"Segoe UI", sans-serif;
+
+
+    background:
+    radial-gradient(circle at center,
+    #3a1028,
+    #090909);
+
+
+    color:white;
+
+}
+
+
+
+
+
+.start{
+
+    text-align:center;
+
+    animation:appear 2s ease;
+
+}
+
+
+
+@keyframes appear{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(30px);
+
+    }
+
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+
+
+
+
+.heart{
+
+
+    font-size:120px;
+
+
+    cursor:pointer;
+
+
+    animation:pulse 1.4s infinite;
+
+
+    filter:
+    drop-shadow(0 0 20px #ff4f81);
+
+
+}
+
+
+
+
+
+@keyframes pulse{
+
+
+    0%,100%{
+
+        transform:scale(1);
+
+    }
+
+
+    50%{
+
+        transform:scale(1.2);
+
+    }
+
+
+}
+
+
+
+
+
+.text{
+
+
+    margin-top:35px;
+
+
+    font-size:28px;
+
+
+    color:#ffd6e8;
+
+
+    animation:blinkText 2s infinite;
+
+
+}
+
+
+
+
+@keyframes blinkText{
+
+
+    50%{
+
+        opacity:.5;
+
+    }
+
+}
+
+
+
+
+
+
+
+.fade{
+
+    position:fixed;
+
+    inset:0;
+
+    background:#000;
+
+    opacity:0;
+
+    pointer-events:none;
+
+    transition:opacity 2.5s ease;
+
+    z-index:9999;
+
+}
+
+
+
+.fade.show{
+
+
+    opacity:1;
+
+
+}
+
+
+
+
+
+</style>
+
+
+</head>
+
+
+
+<body>
+
+
+
+<div class="fade" id="fade"></div>
+
+
+
+<div class="start" id="start">
+
+
+<div class="heart">
+
+❤️
+
+</div>
+
+
+
+<div class="text">
+
+Коснись, чтобы начать
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<audio id="unlockAudio">
+    <source src="music/zero.mp3" type="audio/mpeg">
+</audio>
+
+
+
+
+
+<script>
+
+
+const heart=document.querySelector(".heart");
+
+const unlockAudio=document.getElementById("unlockAudio");
+
+const fade=document.getElementById("fade");
+
+
+heart.addEventListener("click",async()=>{
+
+
+    await unlockAudio.play();
+
+
+    localStorage.setItem(
+        "audioUnlocked",
+        "true"
+    );
+
+
+    fade.classList.add("show");
+
+
+    setTimeout(()=>{
+
+        window.location.href="FirstScreen.html";
+
+    },1500);
+
+
+});
+
+
+
+</script>
+
+</body>
+
+</html>

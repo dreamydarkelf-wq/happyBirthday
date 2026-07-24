@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Наша история ❤️</title>
+
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+
+body{
+
+    background:
+    radial-gradient(circle at top,#2b1525,#111);
+
+    color:#fff;
+
+    font-family:"Segoe UI", sans-serif;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    padding:40px 20px 100px;
+
+    overflow-x:hidden;
+
+}
+
+
+
+.cursor{
+
+    display:inline-block;
+
+    width:2px;
+
+    animation:blink .8s infinite;
+
+}
+
+
+
+@keyframes blink{
+
+    50%{
+
+        opacity:0;
+
+    }
+
+}
+
+
+
+
+
+/* Картинка */
+
+
+.image-container{
+
+    opacity:0;
+
+    transform:scale(.97);
+
+    transition:1.5s;
+
+}
+
+
+
+.image-container.show{
+
+    opacity:1;
+
+    transform:scale(1);
+
+}
+
+
+
+.image-container img{
+
+    width:100%;
+
+    max-width:1536px;
+
+    height:auto;
+
+    border-radius:20px;
+
+    box-shadow:
+    0 20px 60px rgba(0,0,0,.5);
+
+}
+
+
+
+
+
+/* Текст */
+
+
+.text{
+
+    width:min(900px,90%);
+
+    margin-top:60px;
+
+    font-size:28px;
+
+    line-height:1.8;
+
+}
+
+
+
+.paragraph{
+
+    opacity:0;
+
+    transform:translateY(30px);
+
+    transition:1.2s;
+
+    margin-bottom:38px;
+
+}
+
+
+
+.paragraph.show{
+
+    opacity:1;
+
+    transform:translateY(0);
+
+}
+
+
+
+
+
+/* Сердце */
+
+
+.heart-block{
+
+    opacity:0;
+
+    margin-top:70px;
+
+    text-align:center;
+
+    transition:2s;
+
+}
+
+
+
+.heart-block.show{
+
+    opacity:1;
+
+}
+
+
+
+
+
+.heart{
+
+    display:inline-block;
+
+    font-size:5rem;
+
+    cursor:pointer;
+
+    user-select:none;
+
+    animation:heartBeat 1.3s infinite;
+
+}
+
+
+
+
+
+@keyframes heartBeat{
+
+
+    0%,100%{
+
+        transform:scale(1);
+
+        filter:
+        drop-shadow(0 0 5px #ff4f81);
+
+    }
+
+
+    50%{
+
+        transform:scale(1.25);
+
+        filter:
+        drop-shadow(0 0 25px #ff4f81);
+
+    }
+
+
+}
+
+
+
+
+
+.heart-text{
+
+    margin-top:15px;
+
+    font-size:1.2rem;
+
+    color:#ff8fab;
+
+    font-weight:bold;
+
+}
+
+.fade-screen{
+
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:100%;
+    height:100%;
+
+    background:#000;
+
+    opacity:0;
+
+    pointer-events:none;
+
+    transition:opacity 1.5s ease;
+
+    z-index:999;
+
+}
+
+.fade-screen.active{
+
+    opacity:1;
+
+}
+
+
+
+</style>
+
+</head>
+
+
+
+<body>
+
+<div class="fade-screen"></div>
+
+<div class="image-container" id="image">
+
+    <img src="images/meeting.png" alt="Первая встреча">
+
+</div>
+
+
+
+
+<div class="text" id="text"></div>
+
+
+
+
+<div class="heart-block" id="heartBlock">
+
+
+    <div class="heart">
+        ❤️
+    </div>
+
+
+    <p class="heart-text">
+        Продолжение нашей истории...
+    </p>
+
+
+</div>
+
+
+
+
+
+
+
+<audio id="bgMusic" loop>
+
+    <source src="music/second.mp3" type="audio/mpeg">
+
+</audio>
+
+
+
+
+
+
+
+<script>
+
+
+const paragraphs = [
+
+
+`При нашей первой встрече я увидел перед собой сильную и уверенную в себе тигрицу.`,
+
+
+`Та энергичная, красивая и притягательная девушка тогда завоевала моё внимание и сердце с первых минут разговора.`,
+
+
+`Но со временем я познакомился и с другой твоей стороной: нежностью, женственностью и хрупкостью.`,
+
+
+`И именно это сочетание делает тебя особенной и такой настоящей: ты можешь быть одновременно сильной и смелой, но в то же время милой, тёплой и яркой.`,
+
+
+`А иногда эта нежная сторона создаёт по-настоящему комичные и неожиданные ситуации...`
+
+];
+
+
+
+
+
+const image=document.getElementById("image");
+
+const text=document.getElementById("text");
+
+const heartBlock=document.getElementById("heartBlock");
+
+const music=document.getElementById("bgMusic");
+
+function fadeOutMusic(duration = 2000) {
+
+    const interval = 50;
+    const step = music.volume / (duration / interval);
+
+    const fade = setInterval(() => {
+
+        if (music.volume > step) {
+            music.volume -= step;
+        } else {
+            music.volume = 0;
+            clearInterval(fade);
+        }
+
+    }, interval);
+
+}
+
+window.addEventListener("load",()=>{
+
+
+    if(localStorage.getItem("audioUnlocked")==="true"){
+
+        music.volume=0.25;
+
+
+        music.play().catch(()=>{
+
+            console.log("Автовоспроизведение запрещено браузером");
+
+        });
+
+
+    }
+
+
+});
+
+
+
+
+
+
+
+
+// появление картинки
+
+
+setTimeout(()=>{
+
+
+    image.classList.add("show");
+
+
+},500);
+
+
+
+
+
+
+
+
+
+// текст
+
+
+setTimeout(async()=>{
+
+
+    for(const paragraph of paragraphs){
+
+
+        await typeParagraph(paragraph);
+
+
+        await sleep(1800);
+
+
+    }
+
+
+
+    // сердце появляется после истории
+
+
+    await sleep(1000);
+
+
+    heartBlock.classList.add("show");
+
+
+
+},2500);
+
+
+
+
+
+
+
+
+
+function sleep(ms){
+
+    return new Promise(resolve=>setTimeout(resolve,ms));
+
+}
+
+
+
+
+
+
+
+async function typeParagraph(textValue){
+
+
+    const p=document.createElement("div");
+
+
+    p.className="paragraph show";
+
+
+    text.appendChild(p);
+
+
+
+    const cursor=document.createElement("span");
+
+
+    cursor.className="cursor";
+
+
+    cursor.textContent="|";
+
+
+
+    p.appendChild(cursor);
+
+
+
+
+
+    for(let i=0;i<textValue.length;i++){
+
+
+        cursor.insertAdjacentText(
+            "beforebegin",
+            textValue[i]
+        );
+
+
+        await sleep(42);
+
+
+    }
+
+
+
+    cursor.remove();
+
+
+}
+
+document.querySelector(".heart").onclick = () => {
+
+    // плавное затухание музыки
+    fadeOutMusic(2000);
+
+    // затемнение экрана
+    setTimeout(() => {
+
+        document
+            .querySelector(".fade-screen")
+            .classList.add("active");
+
+    }, 500);
+
+
+    // переход на третий экран
+    setTimeout(() => {
+
+        window.location.href = "ThirdScreen.html";
+
+    }, 2000);
+
+};
+
+</script>
+
+
+
+</body>
+</html>
